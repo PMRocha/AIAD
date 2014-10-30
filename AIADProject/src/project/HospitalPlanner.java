@@ -28,13 +28,15 @@ public class HospitalPlanner extends Agent {
 		// método action
 		public void action() {
 			ACLMessage msg = blockingReceive();
+			ACLMessage reply = msg.createReply();
+			
+			System.out.println(" " + getLocalName() + ": recebi "
+					+ msg.getContent());
+			
 			if (msg.getPerformative() == ACLMessage.INFORM) {
-				System.out.println(" " + getLocalName() + ": recebi "
-						+ msg.getContent());
+				
 				
 				// cria resposta
-				ACLMessage reply = msg.createReply();
-				TimeClock.inc();
 				reply.setContent("Confirmado "+msg.getContent()+TimeClock.timeEpooch);
 				// envia mensagem
 				send(reply);
@@ -64,6 +66,25 @@ public class HospitalPlanner extends Agent {
 		// cria behaviour
 		HospitalPlannerBehaviour b = new HospitalPlannerBehaviour(this);
 		addBehaviour(b);
+		
+		DFAgentDescription template = new DFAgentDescription();
+		ServiceDescription sd1 = new ServiceDescription();
+		
+		
+		sd1.setType("Patient");
+		template.addServices(sd1);
+		try {
+			DFAgentDescription[] result = DFService.search(this, template);
+			// envia mensagem "pong" inicial a todos os agentes "ping"
+			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+			for (int i = 0; i < result.length; ++i)
+				msg.addReceiver(result[i].getName());
+			
+			msg.setContent("Aberto para serviço");
+			send(msg);
+		} catch (FIPAException e) {
+			e.printStackTrace();
+		}
 
 	} // fim do metodo setup
 
