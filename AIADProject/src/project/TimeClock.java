@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 		  public void run() {
 			  TimeClock.timeEpooch+=3600;
 			  System.out.println(TimeClock.timeEpooch);
-			  if(TimeClock.timeEpooch == 1420102800)
+			  if(TimeClock.timeEpooch == 1420426800)
 				  exec.shutdown();
 		  }
 		}, 0, 1, TimeUnit.SECONDS);
