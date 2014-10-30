@@ -1,6 +1,5 @@
 package project;
 
-import project.HospitalPlanner.HospitalPlannerBehaviour;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.domain.DFService;
@@ -11,6 +10,10 @@ import jade.lang.acl.ACLMessage;
 
 public class Patient extends Agent {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String speciality;
 
 	public String getSpeciality() {
@@ -22,6 +25,10 @@ public class Patient extends Agent {
 	}
 
 	class PatientBehaviour extends SimpleBehaviour {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private int n = 0;
 
 		// construtor do behaviour
@@ -95,7 +102,8 @@ public class Patient extends Agent {
 				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 				for (int i = 0; i < result.length; ++i)
 					msg.addReceiver(result[i].getName());
-				msg.setContent("Marcar-"+speciality);
+				TimeClock.inc();
+				msg.setContent("Marcar-"+speciality+TimeClock.timeEpooch);
 				send(msg);
 			} catch (FIPAException e) {
 				e.printStackTrace();

@@ -10,6 +10,11 @@ import jade.lang.acl.ACLMessage;
 
 public class HospitalPlanner extends Agent {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	// classe do behaviour
 	class HospitalPlannerBehaviour extends SimpleBehaviour {
 
@@ -29,7 +34,8 @@ public class HospitalPlanner extends Agent {
 				
 				// cria resposta
 				ACLMessage reply = msg.createReply();
-				reply.setContent("Confirmado "+msg.getContent());
+				TimeClock.inc();
+				reply.setContent("Confirmado "+msg.getContent()+TimeClock.timeEpooch);
 				// envia mensagem
 				send(reply);
 			}
