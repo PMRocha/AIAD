@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
@@ -105,5 +106,7 @@ public class TimeTable {
 		System.out.println(t.timetable.toString());
 		t.ScheduleAppointment(1420106400,"Patient1","uranus");
 		System.out.println(t.timetable.toString());
+	
+		
 	}
 }
