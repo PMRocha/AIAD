@@ -1,10 +1,7 @@
 package project;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,8 +13,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class TimeTable {
-	// timestamp -> Ocupação("livre"||"Especialidade/Paciente") Hospital
-	// timestamp -> Ocupação("ocupado"||"livre"||"Especialidade")
+	// timestamp -> Ocupação("livre"||"Especialidade|Paciente;Especialidade|Paciente") Hospital
+	// timestamp -> Ocupação("ocupado"||"livre"||"Especialidade"(||"Marcação?)")
 	public HashMap<Integer, String> timetable;
 
 	TimeTable(String FileName, int i) throws IOException{
@@ -70,9 +67,43 @@ public class TimeTable {
 		}
 	}
 
-	public static void main(String args[]) throws IOException{
-		new TimeTable("TimeTable.xlsx",0);
-		
+	public HashMap<String,String> interpretConsultations(String slotConsultations){
+		HashMap<String,String> intrepertation = new HashMap<String,String>();
+		if(slotConsultations.equals("livre")){
+			intrepertation.put("livre", "livre");
+		}
+		else{
+			String[] Consultations = slotConsultations.split(";");
+			for(int i=0;i<Consultations.length;i++)
+			{
+				String[] Patient = Consultations[i].split("-");
+				intrepertation.put(Patient[0], Patient[1]);
+			}
+			
+		}
+		return intrepertation;
 	}
 
+	public Boolean slotTaken(String Speciality, int TimeStamp){
+
+		return  interpretConsultations(timetable.get(TimeStamp)).containsKey(Speciality);
+
+	}
+
+	public void ScheduleAppointment(int TimeStamp, String PatientName, String Speciality){
+		if(interpretConsultations(timetable.get(TimeStamp)).get("livre") == "livre")
+			timetable.replace(TimeStamp, Speciality+"-"+PatientName);
+		else{
+			timetable.replace(TimeStamp, timetable.get(TimeStamp)+";"+Speciality+"-"+PatientName);
+		}
+	}
+
+	public static void main(String args[]) throws IOException{
+		TimeTable t = new TimeTable("TimeTable.xlsx",0);
+		System.out.println(t.timetable.toString());
+		t.ScheduleAppointment(1420106400,"Patient1","uranus");
+		System.out.println(t.timetable.toString());
+		t.ScheduleAppointment(1420106400,"Patient1","uranus");
+		System.out.println(t.timetable.toString());
+	}
 }
