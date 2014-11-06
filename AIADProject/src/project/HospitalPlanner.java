@@ -1,5 +1,7 @@
 package project;
 
+import java.io.IOException;
+
 import jade.core.*;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.domain.DFService;
@@ -10,9 +12,6 @@ import jade.lang.acl.ACLMessage;
 
 public class HospitalPlanner extends Agent {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	// classe do behaviour
@@ -29,15 +28,15 @@ public class HospitalPlanner extends Agent {
 		public void action() {
 			ACLMessage msg = blockingReceive();
 			ACLMessage reply = msg.createReply();
-			
+
 			System.out.println(" " + getLocalName() + ": recebi "
 					+ msg.getContent());
-			
+
 			if (msg.getPerformative() == ACLMessage.INFORM) {
-				
-				
+
 				// cria resposta
-				reply.setContent("Confirmado "+msg.getContent()+TimeClock.timeEpooch);
+				reply.setContent("Confirmado " + msg.getContent()
+						+ TimeClock.timeEpooch);
 				// envia mensagem
 				send(reply);
 			}
@@ -55,6 +54,12 @@ public class HospitalPlanner extends Agent {
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
 		sd.setName(getName());
+		try {
+			new TimeTable("TimeTable.xlsx", 0);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		sd.setType("HospitalPlanner");
 		dfd.addServices(sd);
 		try {
@@ -66,11 +71,10 @@ public class HospitalPlanner extends Agent {
 		// cria behaviour
 		HospitalPlannerBehaviour b = new HospitalPlannerBehaviour(this);
 		addBehaviour(b);
-		
+
 		DFAgentDescription template = new DFAgentDescription();
 		ServiceDescription sd1 = new ServiceDescription();
-		
-		
+
 		sd1.setType("Patient");
 		template.addServices(sd1);
 		try {
@@ -79,9 +83,10 @@ public class HospitalPlanner extends Agent {
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 			for (int i = 0; i < result.length; ++i)
 				msg.addReceiver(result[i].getName());
-			
-			msg.setContent("Aberto para serviço");
+
+			msg.setContent("Aberto para servico");
 			send(msg);
+			System.out.println();
 		} catch (FIPAException e) {
 			e.printStackTrace();
 		}

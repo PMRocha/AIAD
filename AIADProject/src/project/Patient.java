@@ -19,6 +19,14 @@ public class Patient extends Agent {
 	private String speciality;
 	private TimeTable timetable;
 
+	public TimeTable getTimetable() {
+		return timetable;
+	}
+
+	public void setTimetable(TimeTable timetable) {
+		this.timetable = timetable;
+	}
+
 	public String getSpeciality() {
 		return speciality;
 	}
@@ -45,7 +53,7 @@ public class Patient extends Agent {
 			ACLMessage reply = msg.createReply();
 			if (msg.getPerformative() == ACLMessage.INFORM) {
 
-				if (msg.getContent().equals("Aberto para serviço")) {
+				if (msg.getContent().equals("Aberto para servico")) {
 				
 					System.out.println(++n + " " + getLocalName() + ": recebi "
 							+ msg.getContent());
@@ -85,7 +93,8 @@ public class Patient extends Agent {
 
 		
 		try {
-			timetable = new TimeTable("TimeTable.xlsx", (int) args[1]);
+			TimeTable timetablehelp = new TimeTable("TimeTable.xlsx", (int) args[1]);
+			setTimetable(timetablehelp);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -113,23 +122,7 @@ public class Patient extends Agent {
 		// cria behaviour
 		PatientBehaviour b = new PatientBehaviour(this);
 		addBehaviour(b);
-		
 
-		/*
-		 * DFAgentDescription template = new DFAgentDescription();
-		 * ServiceDescription sd1 = new ServiceDescription();
-		 * 
-		 * sd1.setType("HospitalPlanner"); template.addServices(sd1); try {
-		 * DFAgentDescription[] result = DFService.search(this, template); //
-		 * envia mensagem "pong" inicial a todos os agentes "ping" ACLMessage
-		 * msg = new ACLMessage(ACLMessage.INFORM); for (int i = 0; i <
-		 * result.length; ++i) msg.addReceiver(result[i].getName());
-		 * TimeClock.inc();
-		 * msg.setContent("Marcar-"+speciality+TimeClock.timeEpooch); send(msg);
-		 * } catch (FIPAException e) { e.printStackTrace(); }
-		 */
-
-		//System.out.println(timetable.timetable.toString());
 	} // fim do metodo setup
 
 }

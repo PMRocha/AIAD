@@ -26,7 +26,7 @@ public class Main {
 		
 		try {
 			AgentController rma = cc.createNewAgent("rma", "jade.tools.rma.rma", null);
-			AgentController h1 = cc.acceptNewAgent("hosp", hosp);
+			
 			
 			AgentController p1 = cc.createNewAgent("pat1", "project.Patient",arguments);
 			rma.start();
@@ -40,7 +40,7 @@ public class Main {
 			AgentController p2 = cc.createNewAgent("pat2", "project.Patient",arguments1);
 			p2.start();
 			
-			
+			AgentController h1 = cc.acceptNewAgent("hosp", hosp);
 			h1.start();
 			
 		} catch (StaleProxyException e) {

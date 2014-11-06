@@ -99,7 +99,7 @@ public class TimeTable {
 		}
 	}
 
-	public static void main(String args[]) throws IOException{
+	/*public static void main(String args[]) throws IOException{
 		TimeTable t = new TimeTable("TimeTable.xlsx",0);
 		System.out.println(t.timetable.toString());
 		t.ScheduleAppointment(1420106400,"Patient1","uranus");
@@ -108,5 +108,5 @@ public class TimeTable {
 		System.out.println(t.timetable.toString());
 	
 		
-	}
+	}*/
 }
