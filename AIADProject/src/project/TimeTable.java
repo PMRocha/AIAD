@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 
+import java.util.Vector;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
@@ -80,7 +82,7 @@ public class TimeTable {
 				String[] Patient = Consultations[i].split("-");
 				intrepertation.put(Patient[0], Patient[1]);
 			}
-			
+
 		}
 		return intrepertation;
 	}
@@ -99,14 +101,54 @@ public class TimeTable {
 		}
 	}
 
+	//returns timestamp of the first free time since the time given (0 if none)
+	public int FirstAvailable(int TimeStamp){
+
+		for (int i=TimeStamp; i>0; i+=3600) {
+			if(timetable.containsKey(i)){
+				if(timetable.get(i).equals("livre")){
+					return i;
+				}
+			}
+			else
+				break;
+		}
+
+		return 0;
+	}
+	
+	//returns the name of the patients with consultations(null if none)
+	public Vector<String> PatientsToNotify(int TimeStamp){
+		String content = new String();
+		if(timetable.containsKey(TimeStamp))
+			content = timetable.get(TimeStamp);
+		if(!content.equals("livre"))
+		{
+			Vector<String> PatientsNames = new Vector<String>();
+			
+			HashMap<String,String> temp = interpretConsultations(content);
+			
+			for(String key:temp.keySet()){
+				PatientsNames.add(temp.get(key));
+			}
+			
+			return PatientsNames;
+		}
+		return null;
+	}
+
 	/*public static void main(String args[]) throws IOException{
 		TimeTable t = new TimeTable("TimeTable.xlsx",0);
 		System.out.println(t.timetable.toString());
 		t.ScheduleAppointment(1420106400,"Patient1","uranus");
 		System.out.println(t.timetable.toString());
-		t.ScheduleAppointment(1420106400,"Patient1","uranus");
+		t.ScheduleAppointment(1420106400,"jorge","jorge");
 		System.out.println(t.timetable.toString());
-	
-		
+		Vector<String> temp = t.PatientsToNotify(1420106400);
+		for(int i=0; i<temp.size();i++){
+			System.out.println(temp.get(i));
+		}
+
+
 	}*/
 }
