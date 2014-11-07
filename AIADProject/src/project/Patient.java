@@ -51,21 +51,29 @@ public class Patient extends Agent {
 		public void action() {
 			ACLMessage msg = blockingReceive();
 			ACLMessage reply = msg.createReply();
+			String content=msg.getContent();
+			long halfDayDif;
+			
 			if (msg.getPerformative() == ACLMessage.INFORM) {
 
-				if (msg.getContent().equals("Aberto para servico")) {
-				
-					System.out.println(++n + " " + getLocalName() + ": recebi "
-							+ msg.getContent());
-					reply.setContent("Marcar-" + speciality
-							+ TimeClock.timeEpooch);
-					System.out.println("Enviei" + reply.getContent());
-					send(reply);
+				if (content.equals("Aberto para servico")) {
+					halfDayDif= TimeClock.timeEpooch + 12 * 3600;
+					appointment(msg, reply,halfDayDif);
 				}
-
+				
 				else {
-					System.out.println(++n + " " + getLocalName() + ": recebi "
-							+ msg.getContent());
+					String[] parts=content.split("-");
+					
+					if(parts[0].equals("Remarcacao"))
+					{
+					halfDayDif= Long.valueOf(parts[1]).longValue();	
+					appointment(msg, reply,halfDayDif);
+					}
+					
+					else
+					{
+							
+					}
 				}
 
 				// cria resposta
@@ -75,6 +83,17 @@ public class Patient extends Agent {
 				 * reply.setContent("yes");
 				 */
 			}
+		}
+
+		// does initial appointment when the program is started (the appointment
+		// can be made with a 12 hours difference)
+		private void appointment(ACLMessage msg, ACLMessage reply,long appTime) {
+			System.out.println(getLocalName() + ": recebi "
+					+ msg.getContent());
+			reply.setContent("Marcacao-" + speciality + "-"
+					+ getTimetable().firstAvailable(appTime));
+			System.out.println("Enviei" + reply.getContent());
+			send(reply);
 		}
 
 		@Override
@@ -91,15 +110,14 @@ public class Patient extends Agent {
 		if (args != null && args.length > 0 && args.length < 3) {
 			speciality = (String) args[0];
 
-		
-		try {
-			TimeTable timetablehelp = new TimeTable("TimeTable.xlsx", (int) args[1]);
-			setTimetable(timetablehelp);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	
+			try {
+				TimeTable timetablehelp = new TimeTable("TimeTable.xlsx",
+						(int) args[1]);
+				setTimetable(timetablehelp);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		} else {
 			System.out.println("Não especificou o tipo");

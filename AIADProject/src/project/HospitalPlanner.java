@@ -10,9 +10,14 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class HospitalPlanner extends Agent {
 
 	private static final long serialVersionUID = 1L;
+	private TimeTable timetable;
 
 	// classe do behaviour
 	class HospitalPlannerBehaviour extends SimpleBehaviour {
@@ -32,14 +37,38 @@ public class HospitalPlanner extends Agent {
 			System.out.println(" " + getLocalName() + ": recebi "
 					+ msg.getContent());
 
+			String[] parts = msg.getContent().split("-");
+
 			if (msg.getPerformative() == ACLMessage.INFORM) {
 
-				// cria resposta
-				reply.setContent("Confirmado " + msg.getContent()
-						+ TimeClock.timeEpooch);
-				// envia mensagem
-				send(reply);
+				if (parts[0].equals("Marcacao")) {
+					makeAppointment(parts[1], parts[2], reply);
+					send(reply);
+				} else {
+			
+				}
+				
 			}
+		}
+
+		private void makeAppointment(String speciality, String timeStamp,
+				ACLMessage reply) {
+
+			long ts = Long.valueOf(timeStamp).longValue();
+			if (timetable.slotTaken(speciality, ts)) {
+				reply.setContent("Remarcacao-" + (ts + 3600));
+				System.out.println("nao marcado");
+
+			} else {
+
+				String[] parts = reply.getReplyWith().split("@");
+
+				timetable.scheduleAppointment(ts, parts[0], speciality);
+				reply.setContent("confirmado");
+				System.out.println("marcado-" + timetable.timetable.get(ts));
+
+			}
+
 		}
 
 		// método done
@@ -55,7 +84,7 @@ public class HospitalPlanner extends Agent {
 		ServiceDescription sd = new ServiceDescription();
 		sd.setName(getName());
 		try {
-			new TimeTable("TimeTable.xlsx", 0);
+			timetable = new TimeTable("TimeTable.xlsx", 0);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -78,6 +107,7 @@ public class HospitalPlanner extends Agent {
 		sd1.setType("Patient");
 		template.addServices(sd1);
 		try {
+			runTime();
 			DFAgentDescription[] result = DFService.search(this, template);
 			// envia mensagem "pong" inicial a todos os agentes "ping"
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
@@ -90,7 +120,38 @@ public class HospitalPlanner extends Agent {
 		} catch (FIPAException e) {
 			e.printStackTrace();
 		}
+	}
 
-	} // fim do metodo setup
+	// fim do metodo setup
+
+	// starts clock
+	private void runTime() {
+
+		ScheduledExecutorService exec = Executors
+				.newSingleThreadScheduledExecutor();
+		exec.scheduleAtFixedRate(new Runnable() {
+			@Override
+			public void run() {
+				String format = "dd/MM/yyyy HH:mm:ss";
+
+				TimeClock.timeEpooch += 3600;
+				System.out.println(System.currentTimeMillis()
+						+ " "
+						+ TimeClock.timeEpooch
+						* 1000
+						+ " "
+						+ new java.text.SimpleDateFormat(format)
+								.format(new java.util.Date(System
+										.currentTimeMillis()))
+						+ " "
+						+ new java.text.SimpleDateFormat(format)
+								.format(new java.util.Date(
+										TimeClock.timeEpooch * 1000)));
+				if (TimeClock.timeEpooch == 1420426800)
+					exec.shutdown();
+			}
+		}, 0, 1, TimeUnit.SECONDS);
+
+	}
 
 }

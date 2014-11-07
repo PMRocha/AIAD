@@ -18,14 +18,14 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class TimeTable {
 	// timestamp -> Ocupação("livre"||"Especialidade|Paciente;Especialidade|Paciente") Hospital
 	// timestamp -> Ocupação("ocupado"||"livre"||"Especialidade"(||"Marcação?)")
-	public HashMap<Integer, String> timetable;
+	public HashMap<Long, String> timetable;
 
-	TimeTable(String FileName, int i) throws IOException{
-		timetable = new HashMap<Integer, String>();
+	TimeTable(String fileName, int i) throws IOException{
+		timetable = new HashMap<Long, String>();
 		try
 		{
 			double ttemp=0;
-			FileInputStream file = new FileInputStream(new File(FileName));
+			FileInputStream file = new FileInputStream(new File(fileName));
 
 			//Create Workbook instance holding reference to .xlsx file
 			XSSFWorkbook workbook = new XSSFWorkbook(file);
@@ -53,7 +53,7 @@ public class TimeTable {
 						ttemp= cell.getNumericCellValue();
 						break;
 					case Cell.CELL_TYPE_STRING:
-						timetable.put((int)ttemp, cell.getStringCellValue());
+						timetable.put((long)ttemp, cell.getStringCellValue());
 						break;
 					case Cell.CELL_TYPE_FORMULA:
 						//Not again
@@ -87,24 +87,24 @@ public class TimeTable {
 		return intrepertation;
 	}
 
-	public Boolean slotTaken(String Speciality, int TimeStamp){
+	public Boolean slotTaken(String speciality, long timeStamp){
 
-		return  interpretConsultations(timetable.get(TimeStamp)).containsKey(Speciality);
+		return  (interpretConsultations(timetable.get(timeStamp)).containsKey(speciality) || interpretConsultations(timetable.get(timeStamp)).containsKey("ocupado"));
 
 	}
 
-	public void ScheduleAppointment(int TimeStamp, String PatientName, String Speciality){
-		if(interpretConsultations(timetable.get(TimeStamp)).get("livre") == "livre")
-			timetable.replace(TimeStamp, Speciality+"-"+PatientName);
+	public void scheduleAppointment(Long timeStamp, String patientName, String speciality){
+		if(interpretConsultations(timetable.get(timeStamp)).get("livre") == "livre")
+			timetable.replace(timeStamp, speciality+"-"+patientName);
 		else{
-			timetable.replace(TimeStamp, timetable.get(TimeStamp)+";"+Speciality+"-"+PatientName);
+			timetable.replace(timeStamp, timetable.get(timeStamp)+";"+speciality+"-"+patientName);
 		}
 	}
 
 	//returns timestamp of the first free time since the time given (0 if none)
-	public int FirstAvailable(int TimeStamp){
+	public long firstAvailable(long timeEpooch){
 
-		for (int i=TimeStamp; i>0; i+=3600) {
+		for (long i=timeEpooch; i>0; i+=3600) {
 			if(timetable.containsKey(i)){
 				if(timetable.get(i).equals("livre")){
 					return i;
@@ -118,21 +118,21 @@ public class TimeTable {
 	}
 	
 	//returns the name of the patients with consultations(null if none)
-	public Vector<String> PatientsToNotify(int TimeStamp){
+	public Vector<String> patientsToNotify(int timeStamp){
 		String content = new String();
-		if(timetable.containsKey(TimeStamp))
-			content = timetable.get(TimeStamp);
+		if(timetable.containsKey(timeStamp))
+			content = timetable.get(timeStamp);
 		if(!content.equals("livre"))
 		{
-			Vector<String> PatientsNames = new Vector<String>();
+			Vector<String> patientsNames = new Vector<String>();
 			
 			HashMap<String,String> temp = interpretConsultations(content);
 			
 			for(String key:temp.keySet()){
-				PatientsNames.add(temp.get(key));
+				patientsNames.add(temp.get(key));
 			}
 			
-			return PatientsNames;
+			return patientsNames;
 		}
 		return null;
 	}
