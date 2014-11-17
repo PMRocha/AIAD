@@ -107,7 +107,8 @@ public class HospitalPlanner extends Agent {
 		sd1.setType("Patient");
 		template.addServices(sd1);
 		try {
-			runTime();
+			runTime(this);
+			
 			DFAgentDescription[] result = DFService.search(this, template);
 			// envia mensagem "pong" inicial a todos os agentes "ping"
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
@@ -122,10 +123,22 @@ public class HospitalPlanner extends Agent {
 		}
 	}
 
+	
+	//sends notication
+	public void sendNotification(String string, String key, long timeEpooch) {
+		
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM); 
+		msg.addReceiver(new AID(string, AID.ISLOCALNAME)); 
+		msg.setContent("Notificacao-"+key+"-"+timeEpooch); 
+		send(msg);
+		
+		System.out.println(string);
+	}
+	
 	// fim do metodo setup
 
 	// starts clock
-	private void runTime() {
+	private void runTime(HospitalPlanner hospitalPlanner) {
 
 		ScheduledExecutorService exec = Executors
 				.newSingleThreadScheduledExecutor();
@@ -135,7 +148,7 @@ public class HospitalPlanner extends Agent {
 				String format = "dd/MM/yyyy HH:mm:ss";
 
 				TimeClock.timeEpooch += 3600;
-				System.out.println(System.currentTimeMillis()
+				System.out.println(/*System.currentTimeMillis()
 						+ " "
 						+ TimeClock.timeEpooch
 						* 1000
@@ -144,14 +157,17 @@ public class HospitalPlanner extends Agent {
 								.format(new java.util.Date(System
 										.currentTimeMillis()))
 						+ " "
-						+ new java.text.SimpleDateFormat(format)
+						+*/ new java.text.SimpleDateFormat(format)
 								.format(new java.util.Date(
 										TimeClock.timeEpooch * 1000)));
 				if (TimeClock.timeEpooch == 1420426800)
 					exec.shutdown();
+				
+				hospitalPlanner.timetable.patientsToNotify(TimeClock.timeEpooch,hospitalPlanner);
+				hospitalPlanner.timetable.patientsHavingAppointment(TimeClock.timeEpooch);
+				
 			}
 		}, 0, 1, TimeUnit.SECONDS);
 
 	}
-
 }

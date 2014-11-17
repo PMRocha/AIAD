@@ -40,6 +40,9 @@ public class Main {
 			AgentController p2 = cc.createNewAgent("Patient2", "project.Patient",arguments);
 			p2.start();
 			
+			AgentController p3 = cc.createNewAgent("Patient3", "project.Patient",arguments1);
+			p3.start();
+			
 			AgentController h1 = cc.acceptNewAgent("hosp", hosp);
 			h1.start();
 			

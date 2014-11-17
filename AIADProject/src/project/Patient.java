@@ -40,7 +40,6 @@ public class Patient extends Agent {
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
-		private int n = 0;
 
 		// construtor do behaviour
 		public PatientBehaviour(Agent a) {
@@ -70,9 +69,14 @@ public class Patient extends Agent {
 					appointment(msg, reply,halfDayDif);
 					}
 					
+					else if(parts[0].equals("Notificacao"))
+					{
+					System.out.println(content);
+					}
+					
 					else
 					{
-							
+						System.out.println("received "+msg.getContent());
 					}
 				}
 
