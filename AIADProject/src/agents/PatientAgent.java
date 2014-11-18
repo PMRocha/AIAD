@@ -1,7 +1,7 @@
-package project;
+package agents;
 
-import java.io.IOException;
-
+import resources.Patient;
+import resources.TimeClock;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.domain.DFService;
@@ -10,35 +10,13 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
-public class Patient extends Agent {
+public class PatientAgent extends Agent {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	private String speciality;
-	private TimeTable timetable;
-
-	public TimeTable getTimetable() {
-		return timetable;
-	}
-
-	public void setTimetable(TimeTable timetable) {
-		this.timetable = timetable;
-	}
-
-	public String getSpeciality() {
-		return speciality;
-	}
-
-	public void setSpeciality(String speciality) {
-		this.speciality = speciality;
-	}
+	private Patient patient;
 
 	class PatientBehaviour extends SimpleBehaviour {
-		/**
-		 * 
-		 */
+
 		private static final long serialVersionUID = 1L;
 
 		// construtor do behaviour
@@ -50,33 +28,32 @@ public class Patient extends Agent {
 		public void action() {
 			ACLMessage msg = blockingReceive();
 			ACLMessage reply = msg.createReply();
-			String content=msg.getContent();
+			String content = msg.getContent();
 			long halfDayDif;
-			
+
 			if (msg.getPerformative() == ACLMessage.INFORM) {
 
 				if (content.equals("Aberto para servico")) {
-					halfDayDif= TimeClock.timeEpooch + 12 * 3600;
-					appointment(msg, reply,halfDayDif);
+					halfDayDif = TimeClock.timeEpooch + 12 * 3600;
+					appointment(msg, reply, halfDayDif);
 				}
-				
+
 				else {
-					String[] parts=content.split("-");
-					
-					if(parts[0].equals("Remarcacao"))
-					{
-					halfDayDif= Long.valueOf(parts[1]).longValue();	
-					appointment(msg, reply,halfDayDif);
+					String[] parts = content.split("-");
+
+					if (parts[0].equals("Remarcacao")) {
+						halfDayDif = Long.valueOf(parts[1]).longValue();
+						appointment(msg, reply, halfDayDif);
 					}
-					
-					else if(parts[0].equals("Notificacao"))
-					{
-					System.out.println(content);
+
+					else if (parts[0].equals("Aproximacao")) {
+						System.out.println("aproximacao "
+								+ patient.getTimetableTimetable().get(
+										Long.valueOf(parts[2]).longValue()));
 					}
-					
-					else
-					{
-						System.out.println("received "+msg.getContent());
+
+					else {
+						System.out.println("received " + msg.getContent());
 					}
 				}
 
@@ -91,11 +68,11 @@ public class Patient extends Agent {
 
 		// does initial appointment when the program is started (the appointment
 		// can be made with a 12 hours difference)
-		private void appointment(ACLMessage msg, ACLMessage reply,long appTime) {
-			System.out.println(getLocalName() + ": recebi "
-					+ msg.getContent());
-			reply.setContent("Marcacao-" + speciality + "-"
-					+ getTimetable().firstAvailable(appTime));
+		private void appointment(ACLMessage msg, ACLMessage reply, long appTime) {
+			System.out.println(getLocalName() + ": recebi " + msg.getContent());
+
+			reply.setContent("Marcacao-" + patient.getSpeciality() + "-"
+					+ patient.getTimetable().firstAvailable(appTime));
 			System.out.println("Enviei" + reply.getContent());
 			send(reply);
 		}
@@ -112,16 +89,7 @@ public class Patient extends Agent {
 		// obtém argumentos
 		Object[] args = getArguments();
 		if (args != null && args.length > 0 && args.length < 3) {
-			speciality = (String) args[0];
-
-			try {
-				TimeTable timetablehelp = new TimeTable("TimeTable.xlsx",
-						(int) args[1]);
-				setTimetable(timetablehelp);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			patient = new Patient((String) args[0], (int) args[1]);
 
 		} else {
 			System.out.println("Não especificou o tipo");
@@ -133,7 +101,7 @@ public class Patient extends Agent {
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
 		sd.setName(getName());
-		sd.setType("Patient");
+		sd.setType("PatientAgent");
 		dfd.addServices(sd);
 		try {
 			DFService.register(this, dfd);

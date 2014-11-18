@@ -1,5 +1,6 @@
 package project;
 
+import agents.HospitalAgent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
@@ -18,7 +19,7 @@ public class Main {
 		// main container (i.e. on this host, port 1099)
 		ContainerController cc = rt.createMainContainer(p);
 		
-		HospitalPlanner hosp=new HospitalPlanner();
+		HospitalAgent hosp=new HospitalAgent();
 		
 		 Object[] arguments = new Object[2];
 		 arguments[0]="pediatria";
@@ -28,7 +29,7 @@ public class Main {
 			AgentController rma = cc.createNewAgent("rma", "jade.tools.rma.rma", null);
 			
 			
-			AgentController p1 = cc.createNewAgent("Patient1", "project.Patient",arguments);
+			AgentController p1 = cc.createNewAgent("Patient1", "agents.PatientAgent",arguments);
 			rma.start();
 			
 			p1.start();
@@ -37,10 +38,10 @@ public class Main {
 			arguments1[0]="oncologia";
 			arguments1[1]=2;
 			
-			AgentController p2 = cc.createNewAgent("Patient2", "project.Patient",arguments);
+			AgentController p2 = cc.createNewAgent("Patient2", "agents.PatientAgent",arguments);
 			p2.start();
 			
-			AgentController p3 = cc.createNewAgent("Patient3", "project.Patient",arguments1);
+			AgentController p3 = cc.createNewAgent("Patient3", "agents.PatientAgent",arguments1);
 			p3.start();
 			
 			AgentController h1 = cc.acceptNewAgent("hosp", hosp);

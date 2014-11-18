@@ -1,4 +1,4 @@
-package project;
+package resources;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,14 +12,16 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class TimeTable {
+import agents.HospitalAgent;
+
+public class TimeTable { 
 	// timestamp ->
 	// Ocupação("livre"||"Especialidade|Paciente;Especialidade|Paciente")
 	// Hospital
 	// timestamp -> Ocupação("ocupado"||"livre"||"Especialidade"(||"Marcação?)")
 	public HashMap<Long, String> timetable;
 
-	TimeTable(String fileName, int i) throws IOException {
+	public TimeTable(String fileName, int i) throws IOException {
 		timetable = new HashMap<Long, String>();
 		try {
 			double ttemp = 0;
@@ -115,7 +117,7 @@ public class TimeTable {
 
 	// sends notifications to patients
 	public void patientsToNotify(long timeEpooch,
-			HospitalPlanner hospitalPlanner) {
+			HospitalAgent hospitalPlanner) {
 		
 		long help=timeEpooch+3600*24;
 				

@@ -1,6 +1,4 @@
-package project;
-
-import java.io.IOException;
+package agents;
 
 import jade.core.*;
 import jade.core.behaviours.SimpleBehaviour;
@@ -14,10 +12,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class HospitalPlanner extends Agent {
+import resources.Hospital;
+import resources.TimeClock;
+import resources.TimeTable;
+
+public class HospitalAgent extends Agent {
 
 	private static final long serialVersionUID = 1L;
-	private TimeTable timetable;
+	private Hospital hospital;
 
 	// classe do behaviour
 	class HospitalPlannerBehaviour extends SimpleBehaviour {
@@ -45,9 +47,9 @@ public class HospitalPlanner extends Agent {
 					makeAppointment(parts[1], parts[2], reply);
 					send(reply);
 				} else {
-			
+
 				}
-				
+
 			}
 		}
 
@@ -55,6 +57,7 @@ public class HospitalPlanner extends Agent {
 				ACLMessage reply) {
 
 			long ts = Long.valueOf(timeStamp).longValue();
+			TimeTable timetable=hospital.getTimetable();
 			if (timetable.slotTaken(speciality, ts)) {
 				reply.setContent("Remarcacao-" + (ts + 3600));
 				System.out.println("nao marcado");
@@ -83,13 +86,9 @@ public class HospitalPlanner extends Agent {
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
 		sd.setName(getName());
-		try {
-			timetable = new TimeTable("TimeTable.xlsx", 0);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		sd.setType("HospitalPlanner");
+			hospital=new Hospital(0,this);
+		
+		sd.setType("HospitalAgent");
 		dfd.addServices(sd);
 		try {
 			DFService.register(this, dfd);
@@ -104,11 +103,9 @@ public class HospitalPlanner extends Agent {
 		DFAgentDescription template = new DFAgentDescription();
 		ServiceDescription sd1 = new ServiceDescription();
 
-		sd1.setType("Patient");
+		sd1.setType("PatientAgent");
 		template.addServices(sd1);
 		try {
-			runTime(this);
-			
 			DFAgentDescription[] result = DFService.search(this, template);
 			// envia mensagem "pong" inicial a todos os agentes "ping"
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
@@ -123,51 +120,18 @@ public class HospitalPlanner extends Agent {
 		}
 	}
 
-	
-	//sends notication
+	// sends notication
 	public void sendNotification(String string, String key, long timeEpooch) {
-		
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM); 
-		msg.addReceiver(new AID(string, AID.ISLOCALNAME)); 
-		msg.setContent("Notificacao-"+key+"-"+timeEpooch); 
+
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg.addReceiver(new AID(string, AID.ISLOCALNAME));
+		msg.setContent("Aproximacao-" + key + "-" + timeEpooch);
 		send(msg);
-		
+
 		System.out.println(string);
 	}
-	
+
 	// fim do metodo setup
 
-	// starts clock
-	private void runTime(HospitalPlanner hospitalPlanner) {
-
-		ScheduledExecutorService exec = Executors
-				.newSingleThreadScheduledExecutor();
-		exec.scheduleAtFixedRate(new Runnable() {
-			@Override
-			public void run() {
-				String format = "dd/MM/yyyy HH:mm:ss";
-
-				TimeClock.timeEpooch += 3600;
-				System.out.println(/*System.currentTimeMillis()
-						+ " "
-						+ TimeClock.timeEpooch
-						* 1000
-						+ " "
-						+ new java.text.SimpleDateFormat(format)
-								.format(new java.util.Date(System
-										.currentTimeMillis()))
-						+ " "
-						+*/ new java.text.SimpleDateFormat(format)
-								.format(new java.util.Date(
-										TimeClock.timeEpooch * 1000)));
-				if (TimeClock.timeEpooch == 1420426800)
-					exec.shutdown();
-				
-				hospitalPlanner.timetable.patientsToNotify(TimeClock.timeEpooch,hospitalPlanner);
-				hospitalPlanner.timetable.patientsHavingAppointment(TimeClock.timeEpooch);
-				
-			}
-		}, 0, 1, TimeUnit.SECONDS);
-
-	}
+	
 }
