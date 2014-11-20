@@ -21,9 +21,11 @@ public class Main {
 		
 		HospitalAgent hosp=new HospitalAgent();
 		
-		 Object[] arguments = new Object[2];
+		 Object[] arguments = new Object[4];
 		 arguments[0]="pediatria";
 		 arguments[1]=1;
+		 arguments[2]=(long)1420106400;
+		 arguments[3]=0;
 		
 		try {
 			AgentController rma = cc.createNewAgent("rma", "jade.tools.rma.rma", null);
@@ -34,9 +36,11 @@ public class Main {
 			
 			p1.start();
 			
-			 Object[] arguments1 = new Object[2];
+			 Object[] arguments1 = new Object[4];
 			arguments1[0]="oncologia";
 			arguments1[1]=2;
+			arguments1[2]=(long)1420113600;
+			arguments1[3]=0;
 			
 			AgentController p2 = cc.createNewAgent("Patient2", "agents.PatientAgent",arguments);
 			p2.start();

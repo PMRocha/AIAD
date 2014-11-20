@@ -1,7 +1,7 @@
 package agents;
 
 import resources.Patient;
-import resources.TimeClock;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.domain.DFService;
@@ -34,8 +34,7 @@ public class PatientAgent extends Agent {
 			if (msg.getPerformative() == ACLMessage.INFORM) {
 
 				if (content.equals("Aberto para servico")) {
-					halfDayDif = TimeClock.timeEpooch + 12 * 3600;
-					appointment(msg, reply, halfDayDif);
+					patient.runTime();
 				}
 
 				else {
@@ -56,13 +55,6 @@ public class PatientAgent extends Agent {
 						System.out.println("received " + msg.getContent());
 					}
 				}
-
-				// cria resposta
-				/*
-				 * ACLMessage reply = msg.createReply(); String received =
-				 * msg.getContent(); System.out.println(received);
-				 * reply.setContent("yes");
-				 */
 			}
 		}
 
@@ -84,16 +76,37 @@ public class PatientAgent extends Agent {
 		}
 	}
 
+	// called by timer in patient
+
+	public void appointment(long appTime) {
+
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg.setContent("Marcacao-" + patient.getSpeciality() + "-"
+				+ patient.getTimetable().firstAvailable(appTime));
+		msg.addReceiver(new AID("hosp", AID.ISLOCALNAME));// ->atenção:
+															// mudar o nome
+															// de hosp para
+															// outro
+															// consoante o
+															// nome do
+															// agente
+															// hospital
+		send(msg);
+
+	}
+
 	// método setup
 	protected void setup() {
 		// obtém argumentos
 		Object[] args = getArguments();
-		if (args != null && args.length > 0 && args.length < 3) {
-			patient = new Patient((String) args[0], (int) args[1]);
+		if (args != null && args.length == 4) {
+			patient = new Patient((String) args[0], (int) args[1],
+					(long) args[2], (int) args[3], this);
 
 		} else {
-			System.out.println("Não especificou o tipo");
-
+			System.out
+					.println("Os parametros do agente paciente estao errados");
+			System.exit(1);// temina programa mas lança exepção
 		}
 
 		// regista agente no DF

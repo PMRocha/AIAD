@@ -8,12 +8,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import resources.Hospital;
-import resources.TimeClock;
 import resources.TimeTable;
 
 public class HospitalAgent extends Agent {
@@ -107,7 +102,6 @@ public class HospitalAgent extends Agent {
 		template.addServices(sd1);
 		try {
 			DFAgentDescription[] result = DFService.search(this, template);
-			// envia mensagem "pong" inicial a todos os agentes "ping"
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 			for (int i = 0; i < result.length; ++i)
 				msg.addReceiver(result[i].getName());
