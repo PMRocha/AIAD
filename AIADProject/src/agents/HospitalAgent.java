@@ -41,10 +41,11 @@ public class HospitalAgent extends Agent {
 				if (parts[0].equals("Marcacao")) {
 					makeAppointment(parts[1], parts[2], reply);
 					send(reply);
+				} else if (parts[0].equals("Urgencia")) {
+					makeAppointment(parts[1], parts[2], reply);
+					send(reply);
 				} else {
-
 				}
-
 			}
 		}
 
@@ -52,7 +53,7 @@ public class HospitalAgent extends Agent {
 				ACLMessage reply) {
 
 			long ts = Long.valueOf(timeStamp).longValue();
-			TimeTable timetable=hospital.getTimetable();
+			TimeTable timetable = hospital.getTimetable();
 			if (timetable.slotTaken(speciality, ts)) {
 				reply.setContent("Remarcacao-" + (ts + 3600));
 				System.out.println("nao marcado");
@@ -81,8 +82,8 @@ public class HospitalAgent extends Agent {
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
 		sd.setName(getName());
-			hospital=new Hospital(0,this);
-		
+		hospital = new Hospital(0, this);
+
 		sd.setType("HospitalAgent");
 		dfd.addServices(sd);
 		try {
@@ -127,5 +128,4 @@ public class HospitalAgent extends Agent {
 
 	// fim do metodo setup
 
-	
 }

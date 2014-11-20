@@ -29,11 +29,18 @@ no lado do hospital detetar consultas urgentes
 
 probabilidade de desmarcar: começamos o programa com uma consulta já marcada para cada utilizador para depois poder ser desmarcada pelo programa
 
+variáveis não estáticas
 ---------------------------
 em caso de urgencias desmarca-se as consultas dos outros e marca-se essa
 
 horarios flexiveis(desmarcaveis)
-
 ---------------------------------
 no patient para ser feita a marcacao só a partir de um certo tempo é usada uma variável perigosa dentro do runTime()
 na função makeAppointment com o nome do agente hospital, se mudar-se o nome do agente hospital é favor mudar também aí
+-------------------------------------
+Urgência ignora horário?
+falta horários meios preenchidos e algoritmo/raciocinio para urgencia
+
+Os resultados desta abordagem devem ser comparados, recorrendo a simulação, com outras 
+estratégias de resolução do problema, como por exemplo uma aproximação do tipo first-come 
+first-served. 

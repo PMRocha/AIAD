@@ -1,0 +1,39 @@
+dados:
+-cada cliente é um agente diferente, com a sua agenda de consultas;
+-em caso do doente não querer a consulta naquela especialidade o agente hospitalar remarca com outros na mesma especialidade
+- na remarcação cada agente tem de ver o seu horário
+-No caso de necessidade de marcação urgente de uma consulta, os agentes dos utentes cujas 
+consultas terão que ser potencialmente adiadas são contactados. Será efetivamente adiada a 
+consulta que cause menos transtorno aos utentes, de acordo com uma função de utilidade que 
+poderá ter em conta, entre outros fatores, a distância temporal entre a consulta a adiar e a 
+data em que o utente está disponível 
+
+problemas:
+-representar horários e marcações
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+"Nome-Especialidade-TipoQuery-Parametros*"
+
+especialidade: 2 a 4 hardcoded
+
+"TipoQuery-Parametros*"
+
+tipoQuery : Marcacao/Desmarcacao/Urgencia/Aproximacao/Remarcacao
+
+Parametros: Data/Hora/Espaço de tempo
+
+horários:hashmap:int tempo (usando tempo epoch)
+1 segundo-> 1 hora: definido ficheiro txt
+
+no lado do hospital detetar consultas urgentes
+
+probabilidade de desmarcar: começamos o programa com uma consulta já marcada para cada utilizador para depois poder ser desmarcada pelo programa
+
+---------------------------
+em caso de urgencias desmarca-se as consultas dos outros e marca-se essa
+
+horarios flexiveis(desmarcaveis)
+
+---------------------------------
+no patient para ser feita a marcacao só a partir de um certo tempo é usada uma variável perigosa dentro do runTime()
+na função makeAppointment com o nome do agente hospital, se mudar-se o nome do agente hospital é favor mudar também aí

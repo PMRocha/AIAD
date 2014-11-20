@@ -10,7 +10,8 @@ import agents.HospitalAgent;
 public class Hospital {
 
 	private TimeTable timetable;
-
+	private long timeEpooch = 1420070400;
+	
 	public Hospital(int i, HospitalAgent hospitalAgent) {
 		try {
 			timetable=new TimeTable("TimeTable.xlsx", i);
@@ -43,7 +44,7 @@ public class Hospital {
 				public void run() {
 					String format = "dd/MM/yyyy HH:mm:ss";
 
-					TimeClock.timeEpooch += 3600;
+					timeEpooch += 3600;
 					System.out.println(/*
 										 * System.currentTimeMillis() + " " +
 										 * TimeClock.timeEpooch 1000 + " " + new
@@ -51,13 +52,13 @@ public class Hospital {
 										 * .format(new java.util.Date(System
 										 * .currentTimeMillis())) + " " +
 										 */new java.text.SimpleDateFormat(format)
-							.format(new java.util.Date(TimeClock.timeEpooch * 1000)));
-					if (TimeClock.timeEpooch == 1420426800)
+							.format(new java.util.Date(timeEpooch * 1000)));
+					if (timeEpooch == 1420426800)
 						exec.shutdown();
 
 					hospital.getTimetable().patientsToNotify(
-							TimeClock.timeEpooch,  hospitalAgent);
-					hospital.getTimetable().patientsHavingAppointment(TimeClock.timeEpooch);
+							timeEpooch,  hospitalAgent);
+					hospital.getTimetable().patientsHavingAppointment(timeEpooch);
 
 				}
 			}, 0, 1, TimeUnit.SECONDS);

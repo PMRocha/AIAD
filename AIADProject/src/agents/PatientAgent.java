@@ -94,6 +94,24 @@ public class PatientAgent extends Agent {
 		send(msg);
 
 	}
+	
+	//marcacao de urgencia
+	
+	public void appointmentUrg(long nextHour) {
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg.setContent("Urgencia-" + patient.getSpeciality() + "-"
+				+ patient.getTimetable().firstAvailable(nextHour));
+		msg.addReceiver(new AID("hosp", AID.ISLOCALNAME));// ->atenção:
+															// mudar o nome
+															// de hosp para
+															// outro
+															// consoante o
+															// nome do
+															// agente
+															// hospital
+		send(msg);
+		
+	}
 
 	// método setup
 	protected void setup() {

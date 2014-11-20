@@ -15,13 +15,14 @@ public class Patient {
 	private int typeCommunication;// if 0 the appointment will be normal, if 1
 									// the appointment will be a urgence
 	private PatientAgent patientAgent;
+	private long timeEpooch = 1420070400;
 
 	public Patient(String speciality, int page, long startCommunication,
 			int typeCommunication, PatientAgent patientAgent) {
-		
+
 		this.setSpeciality(speciality);
-		this.patientAgent=patientAgent;
-		
+		this.patientAgent = patientAgent;
+
 		if (startCommunication <= 1420070400) {
 			this.startCommunication = 1420070400;
 		} else
@@ -67,11 +68,20 @@ public class Patient {
 		exec.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
-				if (startCommunication == TimeClock.timeEpooch) {
-					System.out.println("mandei mensagem");
-					
-					long halfDayDif = TimeClock.timeEpooch + 12 * 3600;
-					patientAgent.appointment(halfDayDif);
+
+				timeEpooch += 3600;
+
+				if (startCommunication == timeEpooch) {
+
+					if (typeCommunication == 0) {
+						long halfDayDif = timeEpooch + 12 * 3600;
+						patientAgent.appointment(halfDayDif);
+					}
+
+					else if (typeCommunication == 1) {
+						long nextHour = timeEpooch + 3600;
+						patientAgent.appointmentUrg(nextHour);
+					}
 				}
 			}
 		}, 0, 1, TimeUnit.SECONDS);
