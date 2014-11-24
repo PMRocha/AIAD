@@ -46,9 +46,35 @@ public class PatientAgent extends Agent {
 					}
 
 					else if (parts[0].equals("Aproximacao")) {
-						System.out.println("aproximacao "
-								+ patient.getTimetableTimetable().get(
-										Long.valueOf(parts[2]).longValue()));
+						
+						System.out.println("Confirmacao:"+parts[1]+","+parts[2]);
+						long time=Long.valueOf(parts[2]).longValue();
+						
+						if(patient.appointment(time))
+						{
+							reply.setContent("ConfirmadoAproximacao-"+patient.getSpeciality()+"-"+parts[2]);
+							send(reply);
+						}
+						
+						else
+						{
+							if(patient.freeTime(time))
+							{
+								reply.setContent("AproximacaoMarcada-"+patient.getSpeciality()+"-"+parts[2]);
+								send(reply);
+							}
+							
+							else
+							{
+								reply.setContent("RemarcacaoAproximacao-"+patient.getSpeciality()+"-"+patient.getTimetable().firstAvailable(time+3600));
+								send(reply);
+							}
+							
+						}
+					}
+					else if (parts[0].equals("Marcado")) {
+						System.out.println("consulta marcada:"+parts[1]);
+						patient.setAppointment(Long.valueOf(parts[1]).longValue());
 					}
 
 					else {
@@ -56,6 +82,12 @@ public class PatientAgent extends Agent {
 					}
 				}
 			}
+		}
+
+		@Override
+		public boolean done() {
+			// TODO Auto-generated method stub
+			return false;
 		}
 
 		// does initial appointment when the program is started (the appointment
@@ -67,12 +99,6 @@ public class PatientAgent extends Agent {
 					+ patient.getTimetable().firstAvailable(appTime));
 			System.out.println("Enviei" + reply.getContent());
 			send(reply);
-		}
-
-		@Override
-		public boolean done() {
-			// TODO Auto-generated method stub
-			return false;
 		}
 	}
 
@@ -94,9 +120,9 @@ public class PatientAgent extends Agent {
 		send(msg);
 
 	}
-	
-	//marcacao de urgencia
-	
+
+	// marcacao de urgencia
+
 	public void appointmentUrg(long nextHour) {
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setContent("Urgencia-" + patient.getSpeciality() + "-"
@@ -110,7 +136,7 @@ public class PatientAgent extends Agent {
 															// agente
 															// hospital
 		send(msg);
-		
+
 	}
 
 	// método setup

@@ -34,6 +34,22 @@ em caso de urgencias desmarca-se as consultas dos outros e marca-se essa
 
 horarios flexiveis(desmarcaveis)
 
----------------------------------
-no patient para ser feita a marcacao só a partir de um certo tempo é usada uma variável perigosa dentro do runTime()
-na função makeAppointment com o nome do agente hospital, se mudar-se o nome do agente hospital é favor mudar também aí
+Na detecao da marcacao tempo livre????
+-------------------------------------
+
+Funcionamento da marcacao:
+paciente:Marcacao-especialidade-hora
+Hospital:se tiver o horário livre para a especialidade: marca
+         se não manda remarcacao-hora a que o paciente responde com a mensagem remarcao outra vez voltando a este "if" do hospital
+
+Funcionamento da aproximação:
+Hospital:Aproximacao-hora (da consulta)
+Paciente: Se marcada a consulta no horario responde:ConfirmadoAproximacao-especialidade-hora
+	  Se livre no horário estiver livre responde:AproximacaoMarcada-especialidade-hora
+	  Se ocupado no horário estiver ocupado responde:RemarcacaoAproximacao-especialide-hora
+
+Funcionamento da urgência:
+Paciente: Urgencia-especialidade-hora
+
+
+--------------------------------------

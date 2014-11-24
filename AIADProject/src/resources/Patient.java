@@ -88,4 +88,16 @@ public class Patient {
 
 	}
 
+	public void setAppointment(long longValue) {
+		timetable.timetable.replace(longValue, "marcado");
+	}
+
+	public boolean appointment(long time) {
+		return timetable.timetable.get(time).equals("marcado");
+	}
+
+	public boolean freeTime(long time) {
+		return timetable.timetable.get(time).equals("livre");
+	}
+
 }

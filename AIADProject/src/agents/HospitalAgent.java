@@ -49,6 +49,7 @@ public class HospitalAgent extends Agent {
 			}
 		}
 
+		
 		private void makeAppointment(String speciality, String timeStamp,
 				ACLMessage reply) {
 
@@ -61,10 +62,9 @@ public class HospitalAgent extends Agent {
 			} else {
 
 				String[] parts = reply.getReplyWith().split("@");
-
 				timetable.scheduleAppointment(ts, parts[0], speciality);
-				reply.setContent("confirmado");
-				System.out.println("marcado-" + timetable.timetable.get(ts));
+				reply.setContent("Marcado-"+ts);
+				System.out.println("Marcado-" + timetable.timetable.get(ts));
 
 			}
 
