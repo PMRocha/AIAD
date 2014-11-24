@@ -82,6 +82,23 @@ public class TimeTable {
 		return intrepertation;
 	}
 
+	public String NextPatient (long timeEpooch,long maxTimeSearch, String Speciality) {
+		String PatientName = null;
+		String content = new String();
+		for(long i=timeEpooch;i<maxTimeSearch; i+=3600){
+			if (!content.equals("livre")) {
+
+				HashMap<String, String> temp = interpretConsultations(content);
+				for (String key : temp.keySet()) {
+					if(key.equals(Speciality))
+						return temp.get(key);
+				}
+			}
+		}
+
+		return PatientName;
+	}
+	
 	public Boolean slotTaken(String speciality, long timeStamp) {
 
 		return (interpretConsultations(timetable.get(timeStamp)).containsKey(
@@ -106,6 +123,20 @@ public class TimeTable {
 		for (long i = timeEpooch; i > 0; i += 3600) {
 			if (timetable.containsKey(i)) {
 				if (timetable.get(i).equals("livre")) {
+					return i;
+				}
+			} else
+				break;
+		}
+
+		return 0;
+	}
+	
+	public long firstAvailableReschedulable(long timeEpooch) {
+
+		for (long i = timeEpooch; i > 0; i += 3600) {
+			if (timetable.containsKey(i)) {
+				if (timetable.get(i).equals("livre")||timetable.get(i).equals("ocupador")) {
 					return i;
 				}
 			} else
@@ -149,18 +180,4 @@ public class TimeTable {
 		
 	}
 
-	/*
-	 * public static void main(String args[]) throws IOException{ TimeTable t =
-	 * new TimeTable("TimeTable.xlsx",0);
-	 * System.out.println(t.timetable.toString());
-	 * t.ScheduleAppointment(1420106400,"Patient1","uranus");
-	 * System.out.println(t.timetable.toString());
-	 * t.ScheduleAppointment(1420106400,"jorge","jorge");
-	 * System.out.println(t.timetable.toString()); Vector<String> temp =
-	 * t.PatientsToNotify(1420106400); for(int i=0; i<temp.size();i++){
-	 * System.out.println(temp.get(i)); }
-	 * 
-	 * 
-	 * }
-	 */
 }
