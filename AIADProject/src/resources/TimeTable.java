@@ -71,6 +71,10 @@ public class TimeTable {
 		HashMap<String, String> intrepertation = new HashMap<String, String>();
 		if (slotConsultations.equals("livre")) {
 			intrepertation.put("livre", "livre");
+		}
+		else if (slotConsultations.equals("fechado")) {
+				intrepertation.put("fechado", "fechado");
+				
 		} else {
 			String[] Consultations = slotConsultations.split(";");
 			for (int i = 0; i < Consultations.length; i++) {
@@ -86,7 +90,7 @@ public class TimeTable {
 		String PatientName = null;
 		String content = new String();
 		for(long i=timeEpooch;i<maxTimeSearch; i+=3600){
-			if (!content.equals("livre")) {
+			if (!content.equals("livre")||!content.equals("fechado")) {
 
 				HashMap<String, String> temp = interpretConsultations(content);
 				for (String key : temp.keySet()) {
