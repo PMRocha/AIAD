@@ -90,7 +90,6 @@ public class TimeTable {
 	            FileOutputStream out = new FileOutputStream(new File(fileName+".xlsx"));
 	            workbook.write(out);
 	            out.close();
-	            System.out.println("howtodoinjava_demo.xlsx written successfully on disk.");
 	        }
 	        catch (Exception e)
 	        {
@@ -140,7 +139,7 @@ public class TimeTable {
 
 		return (interpretConsultations(timetable.get(timeStamp)).containsKey(
 				speciality) || interpretConsultations(timetable.get(timeStamp))
-				.containsKey("ocupado"));
+				.containsKey("fechado"));
 
 	}
 
@@ -148,6 +147,10 @@ public class TimeTable {
 			String speciality) {
 		if (interpretConsultations(timetable.get(timeStamp)).get("livre") == "livre")
 			timetable.replace(timeStamp, speciality + "-" + patientName);
+		else if(interpretConsultations(timetable.get(timeStamp)).get("fechado") == "fechado")
+		{
+			
+		}
 		else {
 			timetable.replace(timeStamp, timetable.get(timeStamp) + ";"
 					+ speciality + "-" + patientName);
@@ -192,7 +195,7 @@ public class TimeTable {
 		String content = new String();
 		if (timetable.containsKey(help))
 			content = timetable.get(help);
-		if (!content.equals("livre")) {
+		if (!content.equals("livre")&&!content.equals("fechado")) {
 
 			HashMap<String, String> temp = interpretConsultations(content);
 
@@ -206,8 +209,7 @@ public class TimeTable {
 		String content = new String();
 		if (timetable.containsKey(timeEpooch))
 			content = timetable.get(timeEpooch);
-		if (!content.equals("livre")||!content.equals("fechado")) {
-
+		if (!content.equals("livre")&&!content.equals("fechado")) {
 			HashMap<String, String> temp = interpretConsultations(content);
 
 			for (String key : temp.keySet()) {

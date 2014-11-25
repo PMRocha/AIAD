@@ -36,17 +36,29 @@ horarios flexiveis(desmarcaveis)
 
 Na detecao da marcacao tempo livre????
 -------------------------------------
+Parâmetros:
+Hospital:nada
+Patient:especialidade,pagina do horário,tempo de inicio da comunicacao,
+tipo de consulta(urgente ou normal),algoritmo de marcacao(0->várias mensagens e 1->uma mensagem)
 
+-------------------------------------
 Funcionamento da marcacao:
-paciente:Marcacao-especialidade-hora
-Hospital:se tiver o horário livre para a especialidade: marca
+algoritmo 0:
+paciente:Marcacao0-especialidade-hora
+Hospital:se tiver o horário livre para a especialidade: marca e responde Marcacao-hora da consulta
          se não manda remarcacao-hora a que o paciente responde com a mensagem remarcao outra vez voltando a este "if" do hospital
+
+algoritmo 1:
+paciente: Marcacao1-especialidade-horario
+Hospital:responde Marcacao-hora (este algoritmo faz direto a marcao da consulta, ou seja vê os horários e marca no primeiro tempo livre)
+
 
 Funcionamento da aproximação:
 Hospital:Aproximacao-hora (da consulta)
 Paciente: Se marcada a consulta no horario responde:ConfirmadoAproximacao-especialidade-hora
 	  Se livre no horário estiver livre responde:AproximacaoMarcada-especialidade-hora
-	  Se ocupado no horário estiver ocupado responde:RemarcacaoAproximacao-especialide-hora
+	  Se ocupado no horário estiver ocupado responde:RemarcacaoAproximacao-especialidade-hora-novaHora (mais proxima que está disponivel),
+			a seguir entra no ciclo marcação(se der o hospital manda marcado, se não manda remarcação)
 
 Funcionamento da urgência:
 Paciente: Urgencia-especialidade-hora

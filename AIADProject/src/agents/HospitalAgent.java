@@ -7,7 +7,6 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-
 import resources.Hospital;
 import resources.TimeTable;
 
@@ -38,22 +37,53 @@ public class HospitalAgent extends Agent {
 
 			if (msg.getPerformative() == ACLMessage.INFORM) {
 
-				if (parts[0].equals("Marcacao")) {
+				switch (parts[0]) {
+				case "Marcacao0": {
 					makeAppointment(parts[1], parts[2], reply);
 					send(reply);
-				} else if (parts[0].equals("Urgencia")) {
+					break;
+				}
+				case "Marcacao1": {
+					makeMergingAppointment(parts[1], parts[2], reply);
+					send(reply);
+					break;
+				}
+				case "Urgencia": {
 					makeAppointment(parts[1], parts[2], reply);
 					send(reply);
-				} else {
+					break;
+				}
+				case "RemarcacaoAproximacao": {
+					hospital.clearAppointment(parts[1], Long.valueOf(parts[2])
+							.longValue());
+					hospital.getNextPatient(parts[1]);
+					makeAppointment(parts[1], parts[3], reply);
+					send(reply);
+					break;
+				}
+				default: {
+					System.out.println("mensagem não reconhecida");
+					break;
+				}
 				}
 			}
+
 		}
 
-		
-		private void makeAppointment(String speciality, String timeStamp,
+		private void makeMergingAppointment(String speciality,
+				String timestamp, ACLMessage reply) {
+			TimeTable timetable = hospital.getTimetable();
+			long time = hospital.mergingAppointment(speciality, timestamp);
+			String[] parts = reply.getReplyWith().split("@");
+			timetable.scheduleAppointment(time, parts[0], speciality);
+			reply.setContent("Marcado-" + time);
+			System.out.println("Marcado-" + timetable.timetable.get(time));
+		}
+
+		private void makeAppointment(String speciality, String timestamp,
 				ACLMessage reply) {
 
-			long ts = Long.valueOf(timeStamp).longValue();
+			long ts = Long.valueOf(timestamp).longValue();
 			TimeTable timetable = hospital.getTimetable();
 			if (timetable.slotTaken(speciality, ts)) {
 				reply.setContent("Remarcacao-" + (ts + 3600));
@@ -63,7 +93,7 @@ public class HospitalAgent extends Agent {
 
 				String[] parts = reply.getReplyWith().split("@");
 				timetable.scheduleAppointment(ts, parts[0], speciality);
-				reply.setContent("Marcado-"+ts);
+				reply.setContent("Marcado-" + ts);
 				System.out.println("Marcado-" + timetable.timetable.get(ts));
 
 			}

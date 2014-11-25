@@ -40,45 +40,50 @@ public class PatientAgent extends Agent {
 				else {
 					String[] parts = content.split("-");
 
-					if (parts[0].equals("Remarcacao")) {
+					switch (parts[0]) {
+					case "Remarcacao": {
 						halfDayDif = Long.valueOf(parts[1]).longValue();
 						appointment(msg, reply, halfDayDif);
+						break;
 					}
-
-					else if (parts[0].equals("Aproximacao")) {
-						
-						System.out.println("Confirmacao:"+parts[1]+","+parts[2]);
-						long time=Long.valueOf(parts[2]).longValue();
-						
-						if(patient.appointment(time))
-						{
-							reply.setContent("ConfirmadoAproximacao-"+patient.getSpeciality()+"-"+parts[2]);
+					case "Aproximacao": {
+						System.out.println("Confirmacao:" + parts[1] + ","
+								+ parts[2]);
+						long time = Long.valueOf(parts[2]).longValue();
+						if (patient.appointment(time)) {
+							reply.setContent("ConfirmadoAproximacao-"
+									+ patient.getSpeciality() + "-" + parts[2]);
 							send(reply);
-						}
-						
-						else
-						{
-							if(patient.freeTime(time))
-							{
-								reply.setContent("AproximacaoMarcada-"+patient.getSpeciality()+"-"+parts[2]);
+						} else {
+							if (patient.freeTime(time)) {
+								reply.setContent("AproximacaoMarcada-"
+										+ patient.getSpeciality() + "-"
+										+ parts[2]);
+								send(reply);
+							} else {
+								reply.setContent("RemarcacaoAproximacao-"
+										+ patient.getSpeciality()
+										+ "-"
+										+ parts[2]
+										+ "-"
+										+ patient.getTimetable()
+												.firstAvailable(time + 3600));
 								send(reply);
 							}
-							
-							else
-							{
-								reply.setContent("RemarcacaoAproximacao-"+patient.getSpeciality()+"-"+patient.getTimetable().firstAvailable(time+3600));
-								send(reply);
-							}
-							
-						}
-					}
-					else if (parts[0].equals("Marcado")) {
-						System.out.println("consulta marcada:"+parts[1]);
-						patient.setAppointment(Long.valueOf(parts[1]).longValue());
-					}
 
-					else {
+						}
+						break;
+					}
+					case "Marcado": {
+						System.out.println("recebi->consulta marcada:" + parts[1]);
+						patient.setAppointment(Long.valueOf(parts[1])
+								.longValue());
+						break;
+					}
+					default: {
+						System.out.println("Mensagem não reconhecida");
 						System.out.println("received " + msg.getContent());
+					}
 					}
 				}
 			}
@@ -104,10 +109,10 @@ public class PatientAgent extends Agent {
 
 	// called by timer in patient
 
-	public void appointment(long appTime) {
+	public void appointment0(long appTime) {
 
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setContent("Marcacao-" + patient.getSpeciality() + "-"
+		msg.setContent("Marcacao0-" + patient.getSpeciality() + "-"
 				+ patient.getTimetable().firstAvailable(appTime));
 		msg.addReceiver(new AID("hosp", AID.ISLOCALNAME));// ->atenção:
 															// mudar o nome
@@ -136,6 +141,23 @@ public class PatientAgent extends Agent {
 															// agente
 															// hospital
 		send(msg);
+		
+
+	}
+
+	public void appointment1(String schedule) {
+
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg.setContent("Marcacao1-" + patient.getSpeciality() + "-" + schedule);
+		msg.addReceiver(new AID("hosp", AID.ISLOCALNAME));// ->atenção:
+															// mudar o nome
+															// de hosp para
+															// outro
+															// consoante o
+															// nome do
+															// agente
+															// hospital
+		send(msg);
 
 	}
 
@@ -143,9 +165,9 @@ public class PatientAgent extends Agent {
 	protected void setup() {
 		// obtém argumentos
 		Object[] args = getArguments();
-		if (args != null && args.length == 4) {
+		if (args != null && args.length == 5) {
 			patient = new Patient((String) args[0], (int) args[1],
-					(long) args[2], (int) args[3], this);
+					(long) args[2], (int) args[3], (int) args[4], this);
 
 		} else {
 			System.out
