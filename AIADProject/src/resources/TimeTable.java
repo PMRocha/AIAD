@@ -2,6 +2,7 @@ package resources;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -66,6 +67,37 @@ public class TimeTable {
 		}
 	}
 
+	public void exportTimeTable(String fileName){
+	        //Blank workbook
+	        XSSFWorkbook workbook = new XSSFWorkbook();
+	         
+	        //Create a blank sheet
+	        XSSFSheet sheet = workbook.createSheet("Employee Data");
+	          
+	        //Iterate over data and write to sheet
+	        int rownum = 0;
+	        for (long key : timetable.keySet())
+	        {
+	            Row row = sheet.createRow(rownum++);
+	            Cell timeStamp = row.createCell(0);
+	            Cell Content = row.createCell(1);
+	            timeStamp.setCellValue(key);
+	            Content.setCellValue(timetable.get(key));
+	        }
+	        try
+	        {
+	            //Write the workbook in file system
+	            FileOutputStream out = new FileOutputStream(new File(fileName+".xlsx"));
+	            workbook.write(out);
+	            out.close();
+	            System.out.println("howtodoinjava_demo.xlsx written successfully on disk.");
+	        }
+	        catch (Exception e)
+	        {
+	            e.printStackTrace();
+	        }
+	    }
+	
 	public HashMap<String, String> interpretConsultations(
 			String slotConsultations) {
 		HashMap<String, String> intrepertation = new HashMap<String, String>();
@@ -183,5 +215,25 @@ public class TimeTable {
 		}
 		
 	}
+	
+	public void cancelConsultation(long timeEpooch, String speciality) {
+		String content = new String();
+		String newContent = new String();
+		if (timetable.containsKey(timeEpooch)){
+			content = timetable.get(timeEpooch);
+			HashMap<String, String> temp = interpretConsultations(content);
 
+			for (String key : temp.keySet()) {
+				if(!key.equals(speciality)){
+					if(newContent.length()>1){
+						newContent +=";" + key + "-" + timetable.get(key); 
+					}
+					else{
+						newContent += key + "-" + timetable.get(key); 
+					}
+				}
+			}
+			timetable.put(timeEpooch, newContent);
+		}
+	}
 }
