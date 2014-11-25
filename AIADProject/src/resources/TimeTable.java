@@ -205,7 +205,7 @@ public class TimeTable {
 		String content = new String();
 		if (timetable.containsKey(timeEpooch))
 			content = timetable.get(timeEpooch);
-		if (!content.equals("livre")) {
+		if (!content.equals("livre")||!content.equals("fechado")) {
 
 			HashMap<String, String> temp = interpretConsultations(content);
 
