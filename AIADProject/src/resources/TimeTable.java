@@ -122,6 +122,7 @@ public class TimeTable {
 		String PatientName = null;
 		String content = new String();
 		for(long i=timeEpooch;i<maxTimeSearch; i+=3600){
+			content = timetable.get(i);
 			if (!content.equals("livre")||!content.equals("fechado")) {
 
 				HashMap<String, String> temp = interpretConsultations(content);
