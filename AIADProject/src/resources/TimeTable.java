@@ -145,9 +145,9 @@ public class TimeTable {
 
 	public void scheduleAppointment(Long timeStamp, String patientName,
 			String speciality) {
-		if (interpretConsultations(timetable.get(timeStamp)).get("livre") == "livre")
+		if (interpretConsultations(timetable.get(timeStamp)).get("livre").equals("livre"))
 			timetable.replace(timeStamp, speciality + "-" + patientName);
-		else if(interpretConsultations(timetable.get(timeStamp)).get("fechado") == "fechado")
+		else if(interpretConsultations(timetable.get(timeStamp)).get("fechado").equals("fechado"))
 		{
 			
 		}
