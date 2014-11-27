@@ -49,7 +49,7 @@ Hospital:se tiver o horário livre para a especialidade: marca e responde Marcaca
          se não manda remarcacao-hora a que o paciente responde com a mensagem remarcao outra vez voltando a este "if" do hospital
 
 algoritmo 1:
-paciente: Marcacao1-especialidade-horario
+paciente: Marcacao1-especialidade-horario(feito com hashmap.toString())
 Hospital:responde Marcacao-hora (este algoritmo faz direto a marcao da consulta, ou seja vê os horários e marca no primeiro tempo livre)
 
 
