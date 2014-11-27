@@ -229,6 +229,11 @@ public class TimeTable {
 			content = timetable.get(timeEpooch);
 			HashMap<String, String> temp = interpretConsultations(content);
 
+			if(temp.size()==1){
+				if(temp.containsKey(speciality)){
+					newContent = "livre";
+				}
+			}
 			for (String key : temp.keySet()) {
 				if(!key.equals(speciality)){
 					if(newContent.length()>1){
