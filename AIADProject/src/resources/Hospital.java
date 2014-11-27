@@ -36,14 +36,13 @@ public class Hospital {
 
 	public void getNextPatient(String speciality) {
 		System.out.println("teste:"
-				+ timetable.nextPatient(timeEpooch, timeEpooch + 12 * 3600,
+				+ timetable.NextPatient(timeEpooch, timeEpooch + 12 * 3600,
 						speciality));
 
 	}
 
 	public long mergingAppointment(String speciality, String patientSchedule) {
-		patientSchedule = patientSchedule.substring(1,
-				patientSchedule.length() - 1);
+		patientSchedule = patientSchedule.substring(1,patientSchedule.length() - 1);
 
 		String[] blocks = patientSchedule.split(",");
 		String[] blockParts;
