@@ -46,7 +46,7 @@ Funcionamento da marcacao:
 algoritmo 0:
 paciente:Marcacao0-especialidade-hora
 Hospital:se tiver o horário livre para a especialidade: marca e responde Marcacao-hora da consulta
-         se não manda remarcacao-hora a que o paciente responde com a mensagem remarcao outra vez voltando a este "if" do hospital
+         se não manda remarcacao-hora(a seguir que não esteja fechado) a que o paciente responde com a mensagem marcacao outra vez voltando a este "if" do hospital
 
 algoritmo 1:
 paciente: Marcacao1-especialidade-horario(feito com hashmap.toString())
@@ -59,6 +59,9 @@ Paciente: Se marcada a consulta no horario responde:ConfirmadoAproximacao-especi
 	  Se livre no horário estiver livre responde:AproximacaoMarcada-especialidade-hora
 	  Se ocupado no horário estiver ocupado responde:RemarcacaoAproximacao-especialidade-hora-novaHora (mais proxima que está disponivel),
 			a seguir entra no ciclo marcação(se der o hospital manda marcado, se não manda remarcação)
+Se RemarcacaoAproximacao então o próximo paciente é avisado que existe vaga antes e se a quer através da mensagem AdiantamentoConsulta-especialidade-hora da consulta- hora do adiantamento);
+
+
 
 Funcionamento da urgência:
 Paciente: Urgencia-especialidade-hora
