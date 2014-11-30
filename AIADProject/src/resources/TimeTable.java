@@ -117,24 +117,26 @@ public class TimeTable {
 		return intrepertation;
 	}
 
+	//devolve o patient que tem consulta entre o intervalo de tempo
 	public String NextPatient (long timeEpooch,long maxTimeSearch, String Speciality) {
-		String PatientName = null;
 		String content = new String();
 		for(long i=timeEpooch;i<maxTimeSearch; i+=3600){
+			
 			content = timetable.get(i);
-			if (!content.equals("livre")||!content.equals("fechado")) {
+			if (!content.equals("livre")&&!content.equals("fechado")) {
 
 				HashMap<String, String> temp = interpretConsultations(content);
 				for (String key : temp.keySet()) {
 					if(key.equals(Speciality))
-						return temp.get(key);
+						return temp.get(key)+"-"+i;
 				}
 			}
 		}
 
-		return PatientName;
+		return "";
 	}
 
+	//vê se o horário está ocupado
 	public Boolean slotTaken(String speciality, long timeStamp) {
 
 		return (interpretConsultations(timetable.get(timeStamp)).containsKey(
@@ -143,6 +145,7 @@ public class TimeTable {
 
 	}
 
+	//marca consulta
 	public void scheduleAppointment(Long timeStamp, String patientName,
 			String speciality) {
 		if (interpretConsultations(timetable.get(timeStamp)).get("livre").equals("livre"))
@@ -172,6 +175,7 @@ public class TimeTable {
 		return 0;
 	}
 
+	//devolve timestamp do primeiro tempo livre ou remarcavel
 	public long firstAvailableReschedulable(long timeEpooch) {
 
 		for (long i = timeEpooch, n=0; i > 0; i += 3600, n++) {
@@ -189,7 +193,7 @@ public class TimeTable {
 		return 0;
 	}
 
-	// sends notifications to patients
+	// avisa patients da aproximacao da consulta
 	public void patientsToNotify(long timeEpooch,
 			HospitalAgent hospitalPlanner) {
 
@@ -208,6 +212,7 @@ public class TimeTable {
 		}
 	}
 
+	//ve quem está no momento em consulta
 	public void patientsHavingAppointment(long timeEpooch) {
 		String content = new String();
 		if (timetable.containsKey(timeEpooch))
@@ -222,6 +227,7 @@ public class TimeTable {
 
 	}
 
+	//cancela a consulta
 	public void cancelConsultation(long timeEpooch, String speciality) {
 		String content = new String();
 		String newContent = new String();
@@ -248,6 +254,7 @@ public class TimeTable {
 		}
 	}
 
+	//vê se ambos estão livres
 	public long checkAvailabilityBoth(long timeEpooch,String Speciality, HashMap<Long, String> timeTable) {
 		String content = new String();
 		String newContent = new String();

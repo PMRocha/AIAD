@@ -1,7 +1,10 @@
 package agents;
 
+import algorithmPatientSide.AppointmentAlgorithm0P;
+import algorithmPatientSide.AppointmentAlgorithm1P;
+import algorithmPatientSide.NotifyAppointmentAlgorithmP;
+import algorithmPatientSide.ReappointmentAlgorithmP;
 import resources.Patient;
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.domain.DFService;
@@ -14,6 +17,7 @@ public class PatientAgent extends Agent {
 
 	private static final long serialVersionUID = 1L;
 	private Patient patient;
+	private String name;
 
 	class PatientBehaviour extends SimpleBehaviour {
 
@@ -29,7 +33,6 @@ public class PatientAgent extends Agent {
 			ACLMessage msg = blockingReceive();
 			ACLMessage reply = msg.createReply();
 			String content = msg.getContent();
-			long halfDayDif;
 
 			if (msg.getPerformative() == ACLMessage.INFORM) {
 
@@ -42,47 +45,46 @@ public class PatientAgent extends Agent {
 
 					switch (parts[0]) {
 					case "Remarcacao": {
-						halfDayDif = Long.valueOf(parts[1]).longValue();
-						appointment(msg, reply, halfDayDif);
+						System.out.println(getLocalName() + ": recebi "
+								+ msg.getContent());
+						reply = AppointmentAlgorithm0P.reappointment(Long
+								.valueOf(parts[1]).longValue(), msg, reply,
+								patient);
+						System.out.println(name + ":enviei->"
+								+ reply.getContent());
+						if (!reply.equals(null))
+							send(reply);
 						break;
 					}
 					case "Aproximacao": {
-						System.out.println("Confirmacao:" + parts[1] + ","
-								+ parts[2]);
-						long time = Long.valueOf(parts[2]).longValue();
-						if (patient.appointment(time)) {
-							reply.setContent("ConfirmadoAproximacao-"
-									+ patient.getSpeciality() + "-" + parts[2]);
-							send(reply);
-						} else {
-							if (patient.freeTime(time)) {
-								reply.setContent("AproximacaoMarcada-"
-										+ patient.getSpeciality() + "-"
-										+ parts[2]);
-								send(reply);
-							} else {
-								reply.setContent("RemarcacaoAproximacao-"
-										+ patient.getSpeciality()
-										+ "-"
-										+ parts[2]
-										+ "-"
-										+ patient.getTimetable()
-												.firstAvailable(time + 3600));
-								send(reply);
-							}
-
-						}
+						System.out.println(name + ":recebi->Confirmacao:"
+								+ parts[1] + "," + parts[2]);
+						reply = NotifyAppointmentAlgorithmP.doNotification(
+								reply, patient, parts[2]);
+						System.out.println(name + ":mandei->"
+								+ reply.getContent());
+						send(reply);
 						break;
 					}
 					case "Marcado": {
-						System.out.println("recebi->consulta marcada:" + parts[1]);
+						System.out.println(name + ":recebi->consulta marcada:"
+								+ parts[1]);
 						patient.setAppointment(Long.valueOf(parts[1])
 								.longValue());
 						break;
 					}
+					case "AdiantamentoConsulta": {
+						System.out.println(name
+								+ ":recebi->consulta adiantada marcada:"
+								+ parts[1]);
+						reply=ReappointmentAlgorithmP.reappointment(reply, parts, patient);
+						send(reply);
+					}
+						break;
 					default: {
-						System.out.println("Mensagem não reconhecida");
-						System.out.println("received " + msg.getContent());
+						System.out.println(name
+								+ ":recebi->Mensagem não reconhecida:"
+								+ msg.getContent());
 					}
 					}
 				}
@@ -94,17 +96,6 @@ public class PatientAgent extends Agent {
 			// TODO Auto-generated method stub
 			return false;
 		}
-
-		// does initial appointment when the program is started (the appointment
-		// can be made with a 12 hours difference)
-		private void appointment(ACLMessage msg, ACLMessage reply, long appTime) {
-			System.out.println(getLocalName() + ": recebi " + msg.getContent());
-
-			reply.setContent("Marcacao-" + patient.getSpeciality() + "-"
-					+ patient.getTimetable().firstAvailable(appTime));
-			System.out.println("Enviei" + reply.getContent());
-			send(reply);
-		}
 	}
 
 	// called by timer in patient
@@ -112,53 +103,48 @@ public class PatientAgent extends Agent {
 	public void appointment0(long appTime) {
 
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setContent("Marcacao0-" + patient.getSpeciality() + "-"
-				+ patient.getTimetable().firstAvailable(appTime));
-		msg.addReceiver(new AID("hosp", AID.ISLOCALNAME));// ->atenção:
-															// mudar o nome
-															// de hosp para
-															// outro
-															// consoante o
-															// nome do
-															// agente
-															// hospital
-		send(msg);
-
+		msg = AppointmentAlgorithm0P.appointment(msg, msg, appTime, patient);
+		if (!msg.equals(null)) {
+			msg = setReceiverHospital(msg);
+			send(msg);
+		}
 	}
 
+	// marcacao do algoritmo 1
+	public void appointment1(String schedule) {
+
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg=AppointmentAlgorithm1P.appointment(msg,patient,schedule);
+		msg = setReceiverHospital(msg);
+		send(msg);
+	}
+	
 	// marcacao de urgencia
 
 	public void appointmentUrg(long nextHour) {
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setContent("Urgencia-" + patient.getSpeciality() + "-"
 				+ patient.getTimetable().firstAvailable(nextHour));
-		msg.addReceiver(new AID("hosp", AID.ISLOCALNAME));// ->atenção:
-															// mudar o nome
-															// de hosp para
-															// outro
-															// consoante o
-															// nome do
-															// agente
-															// hospital
+		msg = setReceiverHospital(msg);
 		send(msg);
-		
-
 	}
 
-	public void appointment1(String schedule) {
 
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setContent("Marcacao1-" + patient.getSpeciality() + "-" + schedule);
-		msg.addReceiver(new AID("hosp", AID.ISLOCALNAME));// ->atenção:
-															// mudar o nome
-															// de hosp para
-															// outro
-															// consoante o
-															// nome do
-															// agente
-															// hospital
-		send(msg);
 
+	public ACLMessage setReceiverHospital(ACLMessage msg) {
+		DFAgentDescription template = new DFAgentDescription();
+		ServiceDescription sd1 = new ServiceDescription();
+
+		sd1.setType("HospitalAgent");
+		template.addServices(sd1);
+		try {
+			DFAgentDescription[] result = DFService.search(this, template);
+			msg.addReceiver(result[0].getName());
+		} catch (FIPAException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return msg;
 	}
 
 	// método setup
@@ -170,8 +156,8 @@ public class PatientAgent extends Agent {
 					(long) args[2], (int) args[3], (int) args[4], this);
 
 		} else {
-			System.out
-					.println("Os parametros do agente paciente estao errados");
+			System.out.println(name
+					+ "->Os parametros do agente paciente estao errados");
 			System.exit(1);// temina programa mas lança exepção
 		}
 
@@ -181,6 +167,7 @@ public class PatientAgent extends Agent {
 		ServiceDescription sd = new ServiceDescription();
 		sd.setName(getName());
 		sd.setType("PatientAgent");
+		name = sd.getName();
 		dfd.addServices(sd);
 		try {
 			DFService.register(this, dfd);

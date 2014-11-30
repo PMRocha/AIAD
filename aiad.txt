@@ -57,11 +57,13 @@ Funcionamento da aproximação:
 Hospital:Aproximacao-hora (da consulta)
 Paciente: Se marcada a consulta no horario responde:ConfirmadoAproximacao-especialidade-hora
 	  Se livre no horário estiver livre responde:AproximacaoMarcada-especialidade-hora
-	  Se ocupado no horário estiver ocupado responde:RemarcacaoAproximacao-especialidade-hora-novaHora (mais proxima que está disponivel),
+	 
+ Se ocupado no horário estiver ocupado responde:RemarcacaoAproximacao-especialidade-hora-novaHora (mais proxima que está disponivel),
 			a seguir entra no ciclo marcação(se der o hospital manda marcado, se não manda remarcação)
 Se RemarcacaoAproximacao então o próximo paciente é avisado que existe vaga antes e se a quer através da mensagem AdiantamentoConsulta-especialidade-hora da consulta- hora do adiantamento);
-
-
+Resposta:
+Se sim o paciente responde AdiantamentoAceite-especialidade-hora da consulta- hora do adiantamento e ambos desmarcam a consulta antiga e marcam a nova
+Se não responde AdiantamentoNegado-especialidade-hora do adiantamento e o paciente não faz nada enquanto o hospital procura a proxima pessoa para marcar
 
 Funcionamento da urgência:
 Paciente: Urgencia-especialidade-hora

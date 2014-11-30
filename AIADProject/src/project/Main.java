@@ -1,5 +1,7 @@
 package project;
 
+import java.util.Scanner;
+
 import agents.HospitalAgent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -28,13 +30,13 @@ public class Main {
 		arguments[3] = 0;
 		arguments[4] = 1;
 
-	/*	Object[] arguments1 = new Object[5];
+	    Object[] arguments1 = new Object[5];
 		arguments1[0] = "pediatria";
 		arguments1[1] = 3;
 		arguments1[2] = (long) 1420113600;
 		arguments1[3] = 0;
-		arguments1[4] = 0;
-
+		arguments1[4] = 1;
+		/*	
 		Object[] arguments2 = new Object[5];
 		arguments2[0] = "pediatria";
 		arguments2[1] = 2;
@@ -56,15 +58,20 @@ public class Main {
 					"agents.PatientAgent", arguments);
 			p2.start();
 
-			/*AgentController p3 = cc.createNewAgent("Patient3",
+			AgentController p3 = cc.createNewAgent("Patient3",
 					"agents.PatientAgent", arguments1);
 			p3.start();
-			
+			/*
 			AgentController p4 = cc.createNewAgent("Patient4",
 					"agents.PatientAgent", arguments2);
 			p4.start();*/
 
+			
 			AgentController h1 = cc.acceptNewAgent("hosp", hosp);
+			 Scanner scan = new Scanner (System.in);    
+		       System.out.println ("Digite : ");    
+		       scan.nextLine();  
+		       scan.close();
 			h1.start();
 
 		} catch (StaleProxyException e) {

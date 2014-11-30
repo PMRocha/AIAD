@@ -19,7 +19,7 @@ public class Hospital {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		runTime(this, hospitalAgent);
+		runTime(this, hospitalAgent); 
 	}
 
 	public TimeTable getTimetable() {
@@ -34,34 +34,15 @@ public class Hospital {
 		timetable.cancelConsultation(time, speciality);
 	}
 
-	public void getNextPatient(String speciality) {
-		System.out.println("teste:"
-				+ timetable.NextPatient(timeEpooch, timeEpooch + 12 * 3600,
-						speciality));
+	public String getNextPatient(String speciality, long startTime, long endTime) {
+		return timetable.NextPatient(startTime, endTime,
+						speciality);
 
 	}
 
-	public long mergingAppointment(String speciality, String patientSchedule) {
-		patientSchedule = patientSchedule.substring(1,patientSchedule.length() - 1);
-
-		String[] blocks = patientSchedule.split(",");
-		String[] blockParts;
-		long time;
-
-		for (int i = 0; i < blocks.length; i++) {
-			blockParts = blocks[i].split("=");
-			time = Long.valueOf(blockParts[0].substring(1));
-
-			if (time > timeEpooch) {
-				// se o paciente estiver livre
-				if (blockParts[1].equals("livre")) {
-					if (!timetable.slotTaken(speciality, time)) {
-						return time;
-					}
-				}
-			}
-		}
-		return 0;
+	public long getTimeEpooch() {
+		// TODO Auto-generated method stub
+		return timeEpooch;
 	}
 
 	// starts clock
@@ -84,11 +65,12 @@ public class Hospital {
 						.format(new java.util.Date(timeEpooch * 1000)));
 
 				if (timetable.timetable.get(timeEpooch).equals("fechado"))
-					System.out.println("-fechado");
+					System.out.print("-fechado");
 
 				else
-					System.out.println("-aberto");
+					System.out.print("-aberto");
 
+				System.out.println("-----------------------------------------------------------------------------------");
 				if (timeEpooch > 1420423200) {
 					System.out.println("fim");
 					timetable.exportTimeTable("result");
@@ -103,5 +85,7 @@ public class Hospital {
 		}, 0, 1, TimeUnit.SECONDS);
 
 	}
+
+
 
 }
