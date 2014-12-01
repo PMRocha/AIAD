@@ -34,7 +34,7 @@ public class Main {
 		arguments1[0] = "pediatria";
 		arguments1[1] = 3;
 		arguments1[2] = (long) 1420113600;
-		arguments1[3] = 0;
+		arguments1[3] = 1;
 		arguments1[4] = 1;
 		/*	
 		Object[] arguments2 = new Object[5];

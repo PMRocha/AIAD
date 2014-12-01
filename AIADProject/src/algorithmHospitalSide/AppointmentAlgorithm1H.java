@@ -1,5 +1,7 @@
 package algorithmHospitalSide;
 
+import java.util.Arrays;
+
 import jade.lang.acl.ACLMessage;
 import resources.Hospital;
 import resources.TimeTable;
@@ -23,14 +25,17 @@ public class AppointmentAlgorithm1H {
 			String[] blocks = patientSchedule.split(",");
 			String[] blockParts;
 			long time;
+			Arrays.sort(blocks);
+			
 
 			for (int i = 0; i < blocks.length; i++) {
-				blockParts = blocks[i].split("=");
-				time = Long.valueOf(blockParts[0].substring(1));
-
+				blockParts = blocks[i].split("=");	
+				time = Long.valueOf(blockParts[0].replaceAll("\\s+",""));
 				if (time > timeEpooch) {
+					
 					// se o paciente estiver livre
 					if (blockParts[1].equals("livre")) {
+						
 						if (!timetable.slotTaken(speciality, time)) {
 							return time;
 						}
