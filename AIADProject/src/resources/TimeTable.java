@@ -15,7 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import agents.HospitalAgent;
 
-public class TimeTable { 
+public class TimeTable {
 	// timestamp ->
 	// Ocupação("livre"||"Especialidade|Paciente;Especialidade|Paciente")
 	// Hospital
@@ -67,32 +67,29 @@ public class TimeTable {
 		}
 	}
 
-	public void exportTimeTable(String fileName){
-		//Blank workbook
+	public void exportTimeTable(String fileName) {
+		// Blank workbook
 		XSSFWorkbook workbook = new XSSFWorkbook();
 
-		//Create a blank sheet
+		// Create a blank sheet
 		XSSFSheet sheet = workbook.createSheet("Employee Data");
 
-		//Iterate over data and write to sheet
+		// Iterate over data and write to sheet
 		int rownum = 0;
-		for (long key : timetable.keySet())
-		{
+		for (long key : timetable.keySet()) {
 			Row row = sheet.createRow(rownum++);
 			Cell timeStamp = row.createCell(0);
 			Cell Content = row.createCell(1);
 			timeStamp.setCellValue(key);
 			Content.setCellValue(timetable.get(key));
 		}
-		try
-		{
-			//Write the workbook in file system
-			FileOutputStream out = new FileOutputStream(new File(fileName+".xlsx"));
+		try {
+			// Write the workbook in file system
+			FileOutputStream out = new FileOutputStream(new File(fileName
+					+ ".xlsx"));
 			workbook.write(out);
 			out.close();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -102,8 +99,7 @@ public class TimeTable {
 		HashMap<String, String> intrepertation = new HashMap<String, String>();
 		if (slotConsultations.equals("livre")) {
 			intrepertation.put("livre", "livre");
-		}
-		else if (slotConsultations.equals("fechado")) {
+		} else if (slotConsultations.equals("fechado")) {
 			intrepertation.put("fechado", "fechado");
 
 		} else {
@@ -117,18 +113,19 @@ public class TimeTable {
 		return intrepertation;
 	}
 
-	//devolve o patient que tem consulta entre o intervalo de tempo
-	public String NextPatient (long timeEpooch,long maxTimeSearch, String Speciality) {
+	// devolve o patient que tem consulta entre o intervalo de tempo
+	public String NextPatient(long timeEpooch, long maxTimeSearch,
+			String Speciality) {
 		String content = new String();
-		for(long i=timeEpooch;i<maxTimeSearch; i+=3600){
-			
+		for (long i = timeEpooch; i < maxTimeSearch; i += 3600) {
+
 			content = timetable.get(i);
-			if (!content.equals("livre")&&!content.equals("fechado")) {
+			if (!content.equals("livre") && !content.equals("fechado")) {
 
 				HashMap<String, String> temp = interpretConsultations(content);
 				for (String key : temp.keySet()) {
-					if(key.equals(Speciality))
-						return temp.get(key)+"-"+i;
+					if (key.equals(Speciality))
+						return temp.get(key) + "-" + i;
 				}
 			}
 		}
@@ -136,7 +133,7 @@ public class TimeTable {
 		return "";
 	}
 
-	//vê se o horário está ocupado
+	// vê se o horário está ocupado
 	public Boolean slotTaken(String speciality, long timeStamp) {
 
 		return (interpretConsultations(timetable.get(timeStamp)).containsKey(
@@ -145,21 +142,25 @@ public class TimeTable {
 
 	}
 
-	//marca consulta
+	// marca consulta
 	public void scheduleAppointment(Long timeStamp, String patientName,
 			String speciality) {
-		if (interpretConsultations(timetable.get(timeStamp)).get("livre").equals("livre"))
+		if (interpretConsultations(timetable.get(timeStamp)).get("livre")
+				.equals("livre"))
 			timetable.replace(timeStamp, speciality + "-" + patientName);
-		else if(interpretConsultations(timetable.get(timeStamp)).get("fechado").equals("fechado"))
-		{
+		else if (interpretConsultations(timetable.get(timeStamp))
+				.get("fechado").equals("fechado")) {
 
-		}
-		else {
+		} else {
 			timetable.replace(timeStamp, timetable.get(timeStamp) + ";"
 					+ speciality + "-" + patientName);
 		}
 	}
 
+	 public String CheckConsultationsNow(long timeEpoch, String Especialidade){
+		  return interpretConsultations(timetable.get(timeEpoch)).get(Especialidade);
+		 }
+	 
 	// returns timestamp of the first free time since the time given (0 if none)
 	public long firstAvailable(long timeEpooch) {
 
@@ -175,18 +176,18 @@ public class TimeTable {
 		return 0;
 	}
 
-	//devolve timestamp do primeiro tempo livre ou remarcavel
+	// devolve timestamp do primeiro tempo livre ou remarcavel
 	public long firstAvailableReschedulable(long timeEpooch) {
 
-		for (long i = timeEpooch, n=0; i > 0; i += 3600, n++) {
-			if(n<=100){
+		for (long i = timeEpooch, n = 0; i > 0; i += 3600, n++) {
+			if (n <= 100) {
 				if (timetable.containsKey(i)) {
-					if (timetable.get(i).equals("livre")||timetable.get(i).equals("ocupador")) {
+					if (timetable.get(i).equals("livre")
+							|| timetable.get(i).equals("ocupador")) {
 						return i;
 					}
-				} 
-			}
-			else
+				}
+			} else
 				break;
 		}
 
@@ -194,59 +195,57 @@ public class TimeTable {
 	}
 
 	// avisa patients da aproximacao da consulta
-	public void patientsToNotify(long timeEpooch,
-			HospitalAgent hospitalPlanner) {
+	public void patientsToNotify(long timeEpooch, HospitalAgent hospitalPlanner) {
 
-		long help=timeEpooch+3600*24;
+		long help = timeEpooch + 3600 * 24;
 
 		String content = new String();
 		if (timetable.containsKey(help))
 			content = timetable.get(help);
-		if (!content.equals("livre")&&!content.equals("fechado")) {
+		if (!content.equals("livre") && !content.equals("fechado")) {
 
 			HashMap<String, String> temp = interpretConsultations(content);
 
 			for (String key : temp.keySet()) {
-				hospitalPlanner.sendNotification(temp.get(key),key,help);
+				hospitalPlanner.sendNotification(temp.get(key), key, help);
 			}
 		}
 	}
 
-	//ve quem está no momento em consulta
+	// ve quem está no momento em consulta
 	public void patientsHavingAppointment(long timeEpooch) {
 		String content = new String();
 		if (timetable.containsKey(timeEpooch))
 			content = timetable.get(timeEpooch);
-		if (!content.equals("livre")&&!content.equals("fechado")) {
+		if (!content.equals("livre") && !content.equals("fechado")) {
 			HashMap<String, String> temp = interpretConsultations(content);
 
 			for (String key : temp.keySet()) {
-				System.out.println("Consulta-"+temp.get(key)+"-"+key);
+				System.out.println("Consulta-" + temp.get(key) + "-" + key);
 			}
 		}
 
 	}
 
-	//cancela a consulta
+	// cancela a consulta
 	public void cancelConsultation(long timeEpooch, String speciality) {
 		String content = new String();
 		String newContent = new String();
-		if (timetable.containsKey(timeEpooch)){
+		if (timetable.containsKey(timeEpooch)) {
 			content = timetable.get(timeEpooch);
 			HashMap<String, String> temp = interpretConsultations(content);
 
-			if(temp.size()==1){
-				if(temp.containsKey(speciality)){
+			if (temp.size() == 1) {
+				if (temp.containsKey(speciality)) {
 					newContent = "livre";
 				}
 			}
 			for (String key : temp.keySet()) {
-				if(!key.equals(speciality)){
-					if(newContent.length()>1){
-						newContent +=";" + key + "-" + timetable.get(key); 
-					}
-					else{
-						newContent += key + "-" + timetable.get(key); 
+				if (!key.equals(speciality)) {
+					if (newContent.length() > 1) {
+						newContent += ";" + key + "-" + timetable.get(key);
+					} else {
+						newContent += key + "-" + timetable.get(key);
 					}
 				}
 			}
@@ -254,31 +253,33 @@ public class TimeTable {
 		}
 	}
 
-	//vê se ambos estão livres
-	public long checkAvailabilityBoth(long timeEpooch,String Speciality, HashMap<Long, String> timeTable) {
+	// vê se ambos estão livres
+	public long checkAvailabilityBoth(long timeEpooch, String Speciality,
+			HashMap<Long, String> timeTable) {
 		String content = new String();
 		String newContent = new String();
 		Boolean Occupied = false;
-		if (timetable.containsKey(timeEpooch)){
-			for (long i = timeEpooch, n=0; i > 0; i += 3600, n++) {
-				if(n<=100){
+		if (timetable.containsKey(timeEpooch)) {
+			for (long i = timeEpooch, n = 0; i > 0; i += 3600, n++) {
+				if (n <= 100) {
 					content = timetable.get(timeEpooch);
 					HashMap<String, String> temp = interpretConsultations(content);
 
 					for (String key : temp.keySet()) {
-						if(!key.equals(Speciality)){
-							if(newContent.length()>1){
-								Occupied = false; 
-							}
-							else{
+						if (!key.equals(Speciality)) {
+							if (newContent.length() > 1) {
+								Occupied = false;
+							} else {
 								Occupied = true;
 							}
 						}
 					}
-					if((!Occupied && timeTable.get(i).equals("livre"))||(!Occupied && timeTable.get(i).equals("ocupador"))){
-						return i;}
-				}
-				else
+					if ((!Occupied && timeTable.get(i).equals("livre"))
+							|| (!Occupied && timeTable.get(i)
+									.equals("ocupador"))) {
+						return i;
+					}
+				} else
 					break;
 			}
 			return 0;

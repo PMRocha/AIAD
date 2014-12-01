@@ -4,6 +4,7 @@ import algorithmPatientSide.AppointmentAlgorithm0P;
 import algorithmPatientSide.AppointmentAlgorithm1P;
 import algorithmPatientSide.NotifyAppointmentAlgorithmP;
 import algorithmPatientSide.ReappointmentAlgorithmP;
+import algorithmPatientSide.UrgencyAlgorithm0P;
 import resources.Patient;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
@@ -73,11 +74,26 @@ public class PatientAgent extends Agent {
 								.longValue());
 						break;
 					}
+					case "MarcadoUrgencia": {
+						System.out.println(name + ":recebi->urgencia marcada:"
+								+ parts[1]);
+						patient.setUrgentAppointment(Long.valueOf(parts[1])
+								.longValue());
+						break;
+					}
+					case "DesmarcadaPorUrgencia": {
+						System.out.println(name
+								+ ":recebi->consulta desmarcada " + parts[1]);
+						reply=UrgencyAlgorithm0P.createReapointmentUrgenceMessage(reply,Long.valueOf(parts[2]).longValue(),parts[1], patient);
+						send(reply);
+						break;
+					}
 					case "AdiantamentoConsulta": {
 						System.out.println(name
 								+ ":recebi->consulta adiantada marcada:"
 								+ parts[1]);
-						reply=ReappointmentAlgorithmP.reappointment(reply, parts, patient);
+						reply = ReappointmentAlgorithmP.reappointment(reply,
+								parts, patient);
 						send(reply);
 					}
 						break;
@@ -114,11 +130,11 @@ public class PatientAgent extends Agent {
 	public void appointment1(String schedule) {
 
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg=AppointmentAlgorithm1P.appointment(msg,patient,schedule);
+		msg = AppointmentAlgorithm1P.appointment(msg, patient, schedule);
 		msg = setReceiverHospital(msg);
 		send(msg);
 	}
-	
+
 	// marcacao de urgencia
 
 	public void appointmentUrg(long nextHour) {
@@ -128,8 +144,6 @@ public class PatientAgent extends Agent {
 		msg = setReceiverHospital(msg);
 		send(msg);
 	}
-
-
 
 	public ACLMessage setReceiverHospital(ACLMessage msg) {
 		DFAgentDescription template = new DFAgentDescription();

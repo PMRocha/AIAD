@@ -26,7 +26,6 @@ public class AppointmentAlgorithm1H {
 			String[] blockParts;
 			long time;
 			Arrays.sort(blocks);
-			
 
 			for (int i = 0; i < blocks.length; i++) {
 				blockParts = blocks[i].split("=");	

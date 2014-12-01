@@ -65,8 +65,10 @@ Resposta:
 Se sim o paciente responde AdiantamentoAceite-especialidade-hora da consulta- hora do adiantamento e ambos desmarcam a consulta antiga e marcam a nova
 Se não responde AdiantamentoNegado-especialidade-hora do adiantamento e o paciente não faz nada enquanto o hospital procura a proxima pessoa para marcar
 
-Funcionamento da urgência:
+Funcionamento da urgência (algoritmo 0):
 Paciente: Urgencia-especialidade-hora
+Hospital marca no primeiro horário em que ele esteja aberto, se já existir uma marcação para essa hora o hospital depois de marca a urgência avisa esse paciente que a consulta dele foi desmarcada e que
+ele terá que remarcala 
 
 
 --------------------------------------

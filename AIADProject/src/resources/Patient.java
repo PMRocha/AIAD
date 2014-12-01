@@ -112,11 +112,15 @@ public class Patient {
 	}
 
 	public boolean appointment(long time) {
-		return timetable.timetable.get(time).equals("marcado");
+		return (timetable.timetable.get(time).equals("marcado")||timetable.timetable.get(time).equals("marcadoUrgencia"));
 	}
 
 	public boolean freeTime(long time) {
 		return timetable.timetable.get(time).equals("livre");
+	}
+
+	public void setUrgentAppointment(long longValue) {
+		timetable.timetable.replace(longValue, "marcadoUrgencia");
 	}
 
 }

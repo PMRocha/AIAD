@@ -3,6 +3,7 @@ package agents;
 import algorithmHospitalSide.AppointmentAlgorithm0H;
 import algorithmHospitalSide.AppointmentAlgorithm1H;
 import algorithmHospitalSide.ReappointmentAlgorithmH;
+import algorithmHospitalSide.UrgencyAlgorithm0H;
 import jade.core.*;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.domain.DFService;
@@ -41,55 +42,51 @@ public class HospitalAgent extends Agent {
 
 				switch (parts[0]) {
 				case "Marcacao0": {
-					reply = AppointmentAlgorithm0H.makeAppointment(parts[1],
-							parts[2], reply, hospital);
-					send(reply);
+					appointment0Action(reply, parts);
 					break;
 				}
 				case "Marcacao1": {
-					AppointmentAlgorithm1H.makeMergingAppointment(parts[1],
-							parts[2], reply, hospital);
-					send(reply);
+					appointment1Action(reply, parts);
 					break;
 				}
 				case "Urgencia": {
-					reply = AppointmentAlgorithm0H.makeAppointment(parts[1],
-							parts[2], reply, hospital);
+					urgencyAction(reply, parts);
+					break;
+				}
+				case "RemarcadoPorUrgencia": {
+					long time = UrgencyAlgorithm0H.getFirstAvailableTime(Long
+							.valueOf(parts[2]).longValue(), hospital);
+
+					if (Long.valueOf(parts[2]).longValue() == time) {
+
+						String toNotify = UrgencyAlgorithm0H.getPatient(time,
+								hospital, parts[1]);
+
+						reply = UrgencyAlgorithm0H.scheduleAppointment(time,
+								parts[1], reply, hospital);
+
+						System.out.println(Long.valueOf(parts[2]).longValue()
+								+ "-" + parts[1] + "-" + toNotify);
+						if (toNotify != null) {
+							System.out.println("notify:" + toNotify);
+							ACLMessage reappointmentMessage = UrgencyAlgorithm0H
+									.createReappointmentMessage(time, parts[1],
+											toNotify);
+							send(reappointmentMessage);
+						}
+
+					}
+
+					else {
+						reply = UrgencyAlgorithm0H.createReappointmentMessage(
+								time, parts[1]);
+
+					}
 					send(reply);
 					break;
 				}
 				case "RemarcacaoAproximacao": {
-					// parts[1]->especialidade/parts[2]->hora/parts[3]->nova
-					// hora
-					long time = Long.valueOf(parts[2]).longValue();
-					ReappointmentAlgorithmH.setTime(time);
-					ReappointmentAlgorithmH.resetPatients();
-					String patient = reply.getReplyWith();
-					String[] patientParts = patient.split("@");
-					ReappointmentAlgorithmH.addPatients(patientParts[0]);
-					hospital.clearAppointment(parts[1], time);
-					reply = AppointmentAlgorithm0H.makeAppointment(parts[1],
-							parts[3], reply, hospital);
-					send(reply);
-					String nextPatient = ReappointmentAlgorithmH.getNextPatient(
-							parts[1], hospital);
-					if (!nextPatient.equals("")) {
-						// próximo patient=>"patient-horaDaConsulta"
-						ACLMessage forwardMessage = new ACLMessage(AP_INITIATED);
-
-						String nextPatientparts[] = nextPatient.split("-");
-
-						long nextPatientAppointmentTime = Long.valueOf(
-								nextPatientparts[1]).longValue();
-						forwardMessage = ReappointmentAlgorithmH
-								.forwardAppointment(nextPatientparts[0],
-										parts[1], time,
-										nextPatientAppointmentTime,
-										forwardMessage);
-						System.out.println("forwardMessage:"
-								+ forwardMessage.getContent());
-						send(forwardMessage);
-					}
+					notifyReappointmentAction(reply, parts);
 					break;
 				}
 				case "ConfirmadoAproximacao": {
@@ -101,41 +98,11 @@ public class HospitalAgent extends Agent {
 					break;
 				}
 				case "AdiantamentoNegado": {
-					String nextPatient = ReappointmentAlgorithmH.getNextPatient(
-							parts[1], hospital);
-					if (!nextPatient.equals("")) {
-						// próximo patient=>"patient-horaDaConsulta"
-						ACLMessage forwardMessage = new ACLMessage(AP_INITIATED);
-
-						String nextPatientparts[] = nextPatient.split("-");
-
-						long nextPatientAppointmentTime = Long.valueOf(
-								nextPatientparts[1]).longValue();
-						long actualAppointmentTime = Long.valueOf(
-								nextPatientparts[2]).longValue();
-						forwardMessage = ReappointmentAlgorithmH
-								.forwardAppointment(nextPatientparts[0],
-										parts[1], actualAppointmentTime,
-										nextPatientAppointmentTime,
-										forwardMessage);
-						System.out.println("forwardMessage:"
-								+ forwardMessage.getContent());
-						send(forwardMessage);
-					} else {
-						System.out
-								.println("No more parients in the twelve hours diference");
-					}
+					notifyNegativeAction(parts);
 					break;
 				}
 				case "AdiantamentoAceite": {
-					hospital.clearAppointment(parts[1], Long.valueOf(parts[2])
-							.longValue());
-					String patient = reply.getReplyWith();
-					String[] patientParts = patient.split("@");
-					hospital.getTimetable().scheduleAppointment(Long.valueOf(parts[3])
-							.longValue(),patientParts[0] , parts[1]);
-					
-					System.out.println("adiantado");
+					notifyAffirmativeAction(reply, parts);
 					break;
 				}
 				default: {
@@ -146,6 +113,108 @@ public class HospitalAgent extends Agent {
 				}
 			}
 
+		}
+
+		private void notifyAffirmativeAction(ACLMessage reply, String[] parts) {
+			hospital.clearAppointment(parts[1], Long.valueOf(parts[2])
+					.longValue());
+			String patient = reply.getReplyWith();
+			String[] patientParts = patient.split("@");
+			hospital.getTimetable().scheduleAppointment(
+					Long.valueOf(parts[3]).longValue(), patientParts[0],
+					parts[1]);
+
+			System.out.println("adiantado");
+		}
+
+		private void notifyNegativeAction(String[] parts) {
+			String nextPatient = ReappointmentAlgorithmH.getNextPatient(
+					parts[1], hospital);
+			if (!nextPatient.equals("")) {
+				// próximo patient=>"patient-horaDaConsulta"
+				ACLMessage forwardMessage = new ACLMessage(AP_INITIATED);
+
+				String nextPatientparts[] = nextPatient.split("-");
+
+				long nextPatientAppointmentTime = Long.valueOf(
+						nextPatientparts[1]).longValue();
+				long actualAppointmentTime = Long.valueOf(nextPatientparts[2])
+						.longValue();
+				forwardMessage = ReappointmentAlgorithmH.forwardAppointment(
+						nextPatientparts[0], parts[1], actualAppointmentTime,
+						nextPatientAppointmentTime, forwardMessage);
+				System.out.println("forwardMessage:"
+						+ forwardMessage.getContent());
+				send(forwardMessage);
+			} else {
+				System.out
+						.println("No more parients in the twelve hours diference");
+			}
+		}
+
+		private void notifyReappointmentAction(ACLMessage reply, String[] parts) {
+			// parts[1]->especialidade/parts[2]->hora/parts[3]->nova
+			// hora
+			long time = Long.valueOf(parts[2]).longValue();
+			ReappointmentAlgorithmH.setTime(time);
+			ReappointmentAlgorithmH.resetPatients();
+			String patient = reply.getReplyWith();
+			String[] patientParts = patient.split("@");
+			ReappointmentAlgorithmH.addPatients(patientParts[0]);
+			hospital.clearAppointment(parts[1], time);
+			reply = AppointmentAlgorithm0H.makeAppointment(parts[1], parts[3],
+					reply, hospital);
+			send(reply);
+
+			String nextPatient = ReappointmentAlgorithmH.getNextPatient(
+					parts[1], hospital);
+			if (!nextPatient.equals("")) {
+				// próximo patient=>"patient-horaDaConsulta"
+				ACLMessage forwardMessage = new ACLMessage(AP_INITIATED);
+				String nextPatientparts[] = nextPatient.split("-");
+				long nextPatientAppointmentTime = Long.valueOf(
+						nextPatientparts[1]).longValue();
+				forwardMessage = ReappointmentAlgorithmH.forwardAppointment(
+						nextPatientparts[0], parts[1], time,
+						nextPatientAppointmentTime, forwardMessage);
+				System.out.println("forwardMessage:"
+						+ forwardMessage.getContent());
+				send(forwardMessage);
+			}
+		}
+
+		private void appointment0Action(ACLMessage reply, String[] parts) {
+			reply = AppointmentAlgorithm0H.makeAppointment(parts[1], parts[2],
+					reply, hospital);
+			send(reply);
+		}
+
+		private void appointment1Action(ACLMessage reply, String[] parts) {
+			AppointmentAlgorithm1H.makeMergingAppointment(parts[1], parts[2],
+					reply, hospital);
+			send(reply);
+		}
+
+		private void urgencyAction(ACLMessage reply, String[] parts) {
+			long time = UrgencyAlgorithm0H.getFirstAvailableTime(
+					Long.valueOf(parts[2]).longValue(), hospital);
+			String toNotify = UrgencyAlgorithm0H.getPatient(time, hospital,
+					parts[1]);
+
+			System.out.println(Long.valueOf(parts[2]).longValue() + "-"
+					+ parts[1]);
+			if (toNotify != null) {
+				ACLMessage reappointmentMessage = UrgencyAlgorithm0H
+						.createReappointmentMessage(time, parts[1], toNotify);
+				send(reappointmentMessage);
+			}
+			reply = UrgencyAlgorithm0H.appointment(reply, hospital, parts[1],
+					time);
+			if (!reply.equals(null))
+				send(reply);
+			else
+				System.out
+						.println("Impossivel marcar urgencia(sai do limite do horário)");
 		}
 
 		// método done
