@@ -11,8 +11,10 @@ public class Hospital {
 
 	private TimeTable timetable;
 	private long timeEpooch = 1420066800;
+	private int urgencyAlgorithmType;
 
-	public Hospital(int i, HospitalAgent hospitalAgent) {
+	public Hospital(int i, HospitalAgent hospitalAgent, int type) {
+		setUrgencyAlgorithmType(type);
 		try {
 			timetable = new TimeTable("TimeTable.xlsx", i);
 		} catch (IOException e1) {
@@ -84,6 +86,14 @@ public class Hospital {
 			}
 		}, 0, 1, TimeUnit.SECONDS);
 
+	}
+
+	public int getUrgencyAlgorithmType() {
+		return urgencyAlgorithmType;
+	}
+
+	public void setUrgencyAlgorithmType(int urgencyAlgorithmType) {
+		this.urgencyAlgorithmType = urgencyAlgorithmType;
 	}
 
 

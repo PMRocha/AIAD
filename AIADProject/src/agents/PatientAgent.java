@@ -5,6 +5,7 @@ import algorithmPatientSide.AppointmentAlgorithm1P;
 import algorithmPatientSide.NotifyAppointmentAlgorithmP;
 import algorithmPatientSide.ReappointmentAlgorithmP;
 import algorithmPatientSide.UrgencyAlgorithm0P;
+import algorithmPatientSide.UrgencyAlgorithm1P;
 import resources.Patient;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
@@ -88,12 +89,21 @@ public class PatientAgent extends Agent {
 						send(reply);
 						break;
 					}
-					case "AdiantamentoConsulta": {
+					case "RemarcadaConsulta": {
 						System.out.println(name
 								+ ":recebi->consulta adiantada marcada:"
 								+ parts[1]);
 						reply = ReappointmentAlgorithmP.reappointment(reply,
 								parts, patient);
+						send(reply);
+					}
+						break;
+					case "Horario": {
+						System.out.println(name
+								+ ":recebi->Horário:"
+								+ parts[1]);
+						reply = UrgencyAlgorithm1P.schedule(reply,
+								Long.valueOf(parts[1]).longValue(), patient);
 						send(reply);
 					}
 						break;

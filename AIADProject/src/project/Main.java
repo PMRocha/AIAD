@@ -2,7 +2,6 @@ package project;
 
 import java.util.Scanner;
 
-import agents.HospitalAgent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
@@ -20,8 +19,6 @@ public class Main {
 		// Create a new non-main container, connecting to the default
 		// main container (i.e. on this host, port 1099)
 		ContainerController cc = rt.createMainContainer(p);
-
-		HospitalAgent hosp = new HospitalAgent();
 
 		Object[] arguments = new Object[5];
 		arguments[0] = "pediatria";
@@ -66,8 +63,9 @@ public class Main {
 					"agents.PatientAgent", arguments2);
 			p4.start();*/
 
+			AgentController h1 = cc.createNewAgent("hosp",
+					"agents.HospitalAgent", new Object[]{1});
 			
-			AgentController h1 = cc.acceptNewAgent("hosp", hosp);
 			 Scanner scan = new Scanner (System.in);    
 		       System.out.println ("Digite : ");    
 		       scan.nextLine();  
