@@ -36,8 +36,6 @@ public class PatientAgent extends Agent {
 			ACLMessage reply = msg.createReply();
 			String content = msg.getContent();
 
-			if (msg.getPerformative() == ACLMessage.INFORM) {
-
 				if (content.equals("Aberto para servico")) {
 					patient.runTime();
 				}
@@ -112,15 +110,14 @@ public class PatientAgent extends Agent {
 								+ ":recebi->Mensagem não reconhecida:"
 								+ msg.getContent());
 					}
-					}
+					
 				}
 			}
 		}
 
 		@Override
 		public boolean done() {
-			// TODO Auto-generated method stub
-			return false;
+			return patient.isDone();
 		}
 	}
 
@@ -128,7 +125,7 @@ public class PatientAgent extends Agent {
 
 	public void appointment0(long appTime) {
 
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 		msg = AppointmentAlgorithm0P.appointment(msg, msg, appTime, patient);
 		if (!msg.equals(null)) {
 			msg = setReceiverHospital(msg);
@@ -139,7 +136,7 @@ public class PatientAgent extends Agent {
 	// marcacao do algoritmo 1
 	public void appointment1(String schedule) {
 
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 		msg = AppointmentAlgorithm1P.appointment(msg, patient, schedule);
 		msg = setReceiverHospital(msg);
 		send(msg);
@@ -148,7 +145,7 @@ public class PatientAgent extends Agent {
 	// marcacao de urgencia
 
 	public void appointmentUrg(long nextHour) {
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 		msg.setContent("Urgencia-" + patient.getSpeciality() + "-"
 				+ patient.getTimetable().firstAvailable(nextHour));
 		msg = setReceiverHospital(msg);
@@ -204,5 +201,9 @@ public class PatientAgent extends Agent {
 		addBehaviour(b);
 
 	} // fim do metodo setup
+
+	public Patient getPatient() {
+		return patient;
+	}
 
 }

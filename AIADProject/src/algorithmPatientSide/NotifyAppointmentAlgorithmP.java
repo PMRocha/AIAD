@@ -12,16 +12,19 @@ public class NotifyAppointmentAlgorithmP {
 		if (patient.appointment(time)) {
 			reply.setContent("ConfirmadoAproximacao-" + patient.getSpeciality()
 					+ "-" + timeString);
+			reply.setPerformative(ACLMessage.CONFIRM);
 			return reply;
 		} else {
 			if (patient.freeTime(time)) {
 				reply.setContent("AproximacaoMarcada-"
 						+ patient.getSpeciality() + "-" + timeString);
+				reply.setPerformative(ACLMessage.CONFIRM);
 				return reply;
 			} else {
 				reply.setContent("RemarcacaoAproximacao-"
 						+ patient.getSpeciality() + "-" + timeString + "-"
 						+ patient.getTimetable().firstAvailable(time + 3600));
+				reply.setPerformative(ACLMessage.DISCONFIRM);
 				return reply;
 			}
 

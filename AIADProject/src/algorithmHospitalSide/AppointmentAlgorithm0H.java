@@ -18,6 +18,7 @@ public class AppointmentAlgorithm0H {
 					break;
 			}
 			reply.setContent("Remarcacao-" + ts);
+			reply.setPerformative(ACLMessage.DISCONFIRM);
 			System.out.println("nao marcado");
 
 		} else {
@@ -25,6 +26,7 @@ public class AppointmentAlgorithm0H {
 			String[] parts = reply.getReplyWith().split("@");
 			timetable.scheduleAppointment(ts, parts[0], speciality);
 			reply.setContent("Marcado-" + ts);
+			reply.setPerformative(ACLMessage.CONFIRM);
 			System.out.println("Marcado-" + timetable.timetable.get(ts));
 
 		}

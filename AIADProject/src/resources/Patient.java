@@ -18,15 +18,30 @@ public class Patient {
 	private PatientAgent patientAgent;
 	private long timeEpooch = 1420066800;
 	private int algorithmAppointment;
+	private boolean done;
+	
+	//helps with appointment
+	private long timeCommunication;
+	private boolean useReserved;
+
+	public boolean isDone() {
+		return done;
+	}
+
+	public void setDone(boolean done) {
+		this.done = done;
+	}
 
 	public Patient(String speciality, int page, long startCommunication,
 			int typeCommunication, int algorithmAppointment,
 			PatientAgent patientAgent) {
-
+		
+		setTimeCommunication(startCommunication);
+		setUseReserved(false);
 		this.setSpeciality(speciality);
 		this.patientAgent = patientAgent;
 		this.algorithmAppointment = algorithmAppointment;
-
+		done=false;
 		if (startCommunication <= 1420070400) {
 			this.startCommunication = 1420070400;
 		} else
@@ -102,6 +117,34 @@ public class Patient {
 					else
 					System.out.println("Algoritmo de marcacao tem de ser assinalado com 0 ou 1 (5º parametro)");
 				}
+				
+				//printDate();
+				if (timeEpooch > 1420426800) {
+					System.out.println("fim");
+					done=true;
+					System.exit(0);
+				}
+				
+			}
+			
+			private void printDate() {
+				String format = "dd/MM/yyyy HH:mm:ss";
+				System.out.print(/*
+								 * System.currentTimeMillis() + " " +
+								 * TimeClock.timeEpooch 1000 + " " + new
+								 * java.text.SimpleDateFormat(format)
+								 * .format(new java.util.Date(System
+								 * .currentTimeMillis())) + " " +
+								 */new java.text.SimpleDateFormat(format)
+						.format(new java.util.Date(timeEpooch * 1000)));
+
+				if (timetable.timetable.get(timeEpooch).equals("fechado"))
+					System.out.print("-fechado");
+
+				else
+					System.out.print("-aberto");
+
+				System.out.println("-----------------------------------------------------------------------------------");
 			}
 		}, 0, 1, TimeUnit.SECONDS);
 
@@ -121,6 +164,22 @@ public class Patient {
 
 	public void setUrgentAppointment(long longValue) {
 		timetable.timetable.replace(longValue, "marcadoUrgencia");
+	}
+
+	public long getTimeCommunication() {
+		return timeCommunication;
+	}
+
+	public void setTimeCommunication(long timeCommunication) {
+		this.timeCommunication = timeCommunication;
+	}
+
+	public boolean isUseReserved() {
+		return useReserved;
+	}
+
+	public void setUseReserved(boolean useReserved) {
+		this.useReserved = useReserved;
 	}
 
 }

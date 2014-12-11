@@ -12,9 +12,19 @@ public class Hospital {
 	private TimeTable timetable;
 	private long timeEpooch = 1420066800;
 	private int urgencyAlgorithmType;
+	private boolean done;
+
+	public boolean isDone() {
+		return done;
+	}
+
+	public void setDone(boolean done) {
+		this.done = done;
+	}
 
 	public Hospital(int i, HospitalAgent hospitalAgent, int type) {
 		setUrgencyAlgorithmType(type);
+		done=false;
 		try {
 			timetable = new TimeTable("TimeTable.xlsx", i);
 		} catch (IOException e1) {
@@ -55,8 +65,22 @@ public class Hospital {
 		exec.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
-				String format = "dd/MM/yyyy HH:mm:ss";
 				timeEpooch += 3600;
+				printDate();
+				if (timeEpooch > 1420426800) {
+					System.out.println("fim");
+					timetable.exportTimeTable("result");
+					done=true;
+				}
+
+				hospital.getTimetable().patientsToNotify(timeEpooch,
+						hospitalAgent);
+				hospital.getTimetable().patientsHavingAppointment(timeEpooch);
+
+			}
+
+			private void printDate() {
+				String format = "dd/MM/yyyy HH:mm:ss";
 				System.out.print(/*
 								 * System.currentTimeMillis() + " " +
 								 * TimeClock.timeEpooch 1000 + " " + new
@@ -73,16 +97,6 @@ public class Hospital {
 					System.out.print("-aberto");
 
 				System.out.println("-----------------------------------------------------------------------------------");
-				if (timeEpooch > 1420423200) {
-					System.out.println("fim");
-					timetable.exportTimeTable("result");
-					exec.shutdown();
-				}
-
-				hospital.getTimetable().patientsToNotify(timeEpooch,
-						hospitalAgent);
-				hospital.getTimetable().patientsHavingAppointment(timeEpooch);
-
 			}
 		}, 0, 1, TimeUnit.SECONDS);
 

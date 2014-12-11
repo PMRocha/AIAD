@@ -69,6 +69,7 @@ public class UrgencyAlgorithm1H {
 
 		askTimetable.addReceiver(new AID(patients.get(i), AID.ISLOCALNAME));
 		askTimetable.setContent("Horario-" + urgentTime);
+		askTimetable.setPerformative(ACLMessage.REQUEST);
 		return askTimetable;
 	}
 
@@ -116,7 +117,6 @@ public class UrgencyAlgorithm1H {
 
 		TreeNode<String> root = new TreeNode<String>("root");
 		int value = 0;
-		String parts[];
 
 		for (long urgentAppointment = urgentTime; urgentAppointment < urgentTime + 3 * 3600; urgentAppointment += 3600) {
 
@@ -227,6 +227,7 @@ public class UrgencyAlgorithm1H {
 			hospital.getTimetable().scheduleAppointment(time, parts[0], speciality);
 			System.out.println(hospital.getTimetable().CheckConsultationsNow(time, speciality));
 		}
+		msg.setPerformative(ACLMessage.INFORM);
 		return msg;
 	}
 }

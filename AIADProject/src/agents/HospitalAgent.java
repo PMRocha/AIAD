@@ -39,72 +39,72 @@ public class HospitalAgent extends Agent {
 
 			String[] parts = msg.getContent().split("-");
 
-			if (msg.getPerformative() == ACLMessage.INFORM) {
+			switch (parts[0]) {
+			case "Marcacao0": {
+				appointment0Action(reply, parts);
+				break;
+			}
+			case "Marcacao1": {
+				appointment1Action(reply, parts);
+				break;
+			}
+			case "Urgencia": {
+				if (hospital.getUrgencyAlgorithmType() == 0)
+					urgencyAction0(reply, parts);
+				else
+					urgencyAction1(reply, parts);
+				break;
+			}
+			case "RemarcadoPorUrgencia": {
+				urgencyReappointmentAction(reply, parts);
+				break;
+			}
+			case "RemarcacaoAproximacao": {
+				notifyReappointmentAction(reply, parts);
+				break;
+			}
+			case "ConfirmadoAproximacao": {
+				System.out.println("Confirmada consulta");
+				break;
+			}
+			case "AproximacaoMarcada": {
+				System.out.println("Confirmada marcacao consulta");
+				break;
+			}
+			case "AdiantamentoNegado": {
+				notifyNegativeAction(parts);
+				break;
+			}
+			case "AdiantamentoAceite": {
+				notifyAffirmativeAction(reply, parts);
+				break;
+			}
+			case "Horario": {
+				saveScheduleAction(reply, msg, parts);
+				break;
+			}
+			default: {
+				System.out.println("mensagem não reconhecida:"
+						+ msg.getContent());
+				break;
 
-				switch (parts[0]) {
-				case "Marcacao0": {
-					appointment0Action(reply, parts);
-					break;
-				}
-				case "Marcacao1": {
-					appointment1Action(reply, parts);
-					break;
-				}
-				case "Urgencia": {
-					if (hospital.getUrgencyAlgorithmType() == 0)
-						urgencyAction0(reply, parts);
-					else
-						urgencyAction1(reply, parts);
-					break;
-				}
-				case "RemarcadoPorUrgencia": {
-					urgencyReappointmentAction(reply, parts);
-					break;
-				}
-				case "RemarcacaoAproximacao": {
-					notifyReappointmentAction(reply, parts);
-					break;
-				}
-				case "ConfirmadoAproximacao": {
-					System.out.println("Confirmada consulta");
-					break;
-				}
-				case "AproximacaoMarcada": {
-					System.out.println("Confirmada marcacao consulta");
-					break;
-				}
-				case "AdiantamentoNegado": {
-					notifyNegativeAction(parts);
-					break;
-				}
-				case "AdiantamentoAceite": {
-					notifyAffirmativeAction(reply, parts);
-					break;
-				}
-				case "Horario": {
-					saveScheduleAction(reply,msg, parts);
-					break;
-				}
-				default: {
-					System.out.println("mensagem não reconhecida:"
-							+ msg.getContent());
-					break;
-				}
-				}
+			}
 			}
 
 		}
 
-		private void saveScheduleAction(ACLMessage reply,ACLMessage msg, String[] parts) {
-			UrgencyAlgorithm1H.saveSchedule(reply,msg);
+		private void saveScheduleAction(ACLMessage reply, ACLMessage msg,
+				String[] parts) {
+			UrgencyAlgorithm1H.saveSchedule(reply, msg);
 
 			if (UrgencyAlgorithm1H.isStartAlgorithm()) {
 				UrgencyAlgorithm1H.algorithm(hospital);
-				
-				for(int i=0;i<UrgencyAlgorithm1H.getPatientsNewAppointment().size();i++)
-				{
-					ACLMessage rsp=new ACLMessage(ACLMessage.INFORM);
-					rsp=UrgencyAlgorithm1H.createMessageToNotifyAlteration(i,rsp,hospital);
+
+				for (int i = 0; i < UrgencyAlgorithm1H
+						.getPatientsNewAppointment().size(); i++) {
+					ACLMessage rsp = new ACLMessage(ACLMessage.INFORM);
+					rsp = UrgencyAlgorithm1H.createMessageToNotifyAlteration(i,
+							rsp, hospital);
 					send(rsp);
 				}
 			}
@@ -145,14 +145,15 @@ public class HospitalAgent extends Agent {
 		private void notifyAffirmativeAction(ACLMessage reply, String[] parts) {
 			String patient = reply.getReplyWith();
 			String[] patientParts = patient.split("@");
-			
-			if(hospital.getTimetable().CheckConsultationsNow(Long.valueOf(parts[2])
-					.longValue(), parts[1]).equals(patientParts[0]))
-			{
-			hospital.clearAppointment(parts[1], Long.valueOf(parts[2])
-					.longValue());
+
+			if (hospital
+					.getTimetable()
+					.CheckConsultationsNow(Long.valueOf(parts[2]).longValue(),
+							parts[1]).equals(patientParts[0])) {
+				hospital.clearAppointment(parts[1], Long.valueOf(parts[2])
+						.longValue());
 			}
-			
+
 			hospital.getTimetable().scheduleAppointment(
 					Long.valueOf(parts[3]).longValue(), patientParts[0],
 					parts[1]);
@@ -258,9 +259,9 @@ public class HospitalAgent extends Agent {
 					parts[1]);
 			ACLMessage askTimetable = new ACLMessage(ACLMessage.INFORM);
 
-			if (UrgencyAlgorithm1H.getPatientsSize()==0) {
+			if (UrgencyAlgorithm1H.getPatientsSize() == 0) {
 				askTimetable = new ACLMessage(ACLMessage.INFORM);
-				askTimetable.setContent("Marcado-"+time);
+				askTimetable.setContent("Marcado-" + time);
 				send(askTimetable);
 			}
 
@@ -276,7 +277,7 @@ public class HospitalAgent extends Agent {
 
 		// método done
 		public boolean done() {
-			return false;
+			return hospital.isDone();
 		}
 	}
 

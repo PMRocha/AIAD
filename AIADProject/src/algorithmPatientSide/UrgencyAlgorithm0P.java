@@ -10,6 +10,7 @@ public class UrgencyAlgorithm0P {
 		patient.getTimetableTimetable().replace(time, "livre");
 		
 		reply.setContent("RemarcadoPorUrgencia-"+speciality+"-"+patient.getTimetable().firstAvailable(time));
+		reply.setPerformative(ACLMessage.REQUEST);
 		return reply;
 	}
 

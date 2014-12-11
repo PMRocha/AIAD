@@ -18,6 +18,7 @@ public class ReappointmentAlgorithmH {
 		reply.addReceiver(new AID(nextPatient, AID.ISLOCALNAME));
 		reply.setContent("RemarcadaConsulta-" + speciality + "-"
 				+ nextPatientAppointmentTime + "-" + time);
+		reply.setPerformative(ACLMessage.REQUEST);
 		return reply;
 	}
 
@@ -25,7 +26,7 @@ public class ReappointmentAlgorithmH {
 			String speciality, long time, long nextPatientAppointmentTime,
 			ACLMessage forwardMessage) {
 		forwardMessage.addReceiver(new AID(nextPatient, AID.ISLOCALNAME));
-		forwardMessage.setPerformative(ACLMessage.INFORM);
+		forwardMessage.setPerformative(ACLMessage.REQUEST);
 		forwardMessage.setContent("RemarcadaConsulta-" + speciality + "-"
 				+ nextPatientAppointmentTime + "-" + time);
 		return forwardMessage;

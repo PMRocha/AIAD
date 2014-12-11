@@ -14,6 +14,7 @@ public class UrgencyAlgorithm1P {
 		for (long i = time; i < time + 12 * 3600; i += 3600) {
 			content += i + "=" + patient.getTimetableTimetable().get(i) + ",";
 		}
+		msg.setPerformative(ACLMessage.INFORM);
 		msg.setContent(content);
 		return msg;
 	}

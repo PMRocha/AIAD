@@ -24,6 +24,7 @@ public class UrgencyAlgorithm0H {
 		}
 		hospital.getTimetable().scheduleAppointment(time,parts[0] ,speciality);
 		reply.setContent("MarcadoUrgencia-" + time);
+		reply.setPerformative(ACLMessage.CONFIRM);
 		return reply;
 	}
 	
@@ -49,7 +50,7 @@ public class UrgencyAlgorithm0H {
 
 	public static ACLMessage createReappointmentMessage(long time,
 			String speciality, String toNotify) {
-		ACLMessage reappointmentMessage=new ACLMessage(ACLMessage.INFORM);
+		ACLMessage reappointmentMessage=new ACLMessage(ACLMessage.REQUEST);
 		reappointmentMessage.setContent("DesmarcadaPorUrgencia-"+speciality+"-"+(time+3600));
 		patient=toNotify;
 		reappointmentMessage.addReceiver(new AID(toNotify, AID.ISLOCALNAME));
@@ -58,7 +59,7 @@ public class UrgencyAlgorithm0H {
 
 	public static ACLMessage createReappointmentMessage(long time,
 			String speciality) {
-		ACLMessage reappointmentMessage=new ACLMessage(ACLMessage.INFORM);
+		ACLMessage reappointmentMessage=new ACLMessage(ACLMessage.REQUEST);
 		reappointmentMessage.setContent("DesmarcadaPorUrgencia-"+speciality+"-"+(time+3600));
 		return reappointmentMessage;
 	}
@@ -72,6 +73,7 @@ public class UrgencyAlgorithm0H {
 		
 		hospital.getTimetable().scheduleAppointment(time, patient, speciality);
 		reply.setContent("Marcado-"+time);
+		reply.setPerformative(ACLMessage.CONFIRM);
 		return reply;
 	}
 

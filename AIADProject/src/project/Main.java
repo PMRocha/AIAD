@@ -25,14 +25,14 @@ public class Main {
 		arguments[1] = 1;
 		arguments[2] = (long) 1420106400;
 		arguments[3] = 0;
-		arguments[4] = 1;
+		arguments[4] = 0;
 
 	    Object[] arguments1 = new Object[5];
 		arguments1[0] = "pediatria";
 		arguments1[1] = 3;
 		arguments1[2] = (long) 1420113600;
 		arguments1[3] = 1;
-		arguments1[4] = 1;
+		arguments1[4] = 0;
 		/*	
 		Object[] arguments2 = new Object[5];
 		arguments2[0] = "pediatria";

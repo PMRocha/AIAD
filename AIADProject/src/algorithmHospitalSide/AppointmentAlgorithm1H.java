@@ -15,6 +15,7 @@ public class AppointmentAlgorithm1H {
 		String[] parts = reply.getReplyWith().split("@");
 		timetable.scheduleAppointment(time, parts[0], speciality);
 		reply.setContent("Marcado-" + time);
+		reply.setPerformative(ACLMessage.CONFIRM);
 		System.out.println("Marcado-" + timetable.timetable.get(time));
 	}
 	
@@ -27,13 +28,28 @@ public class AppointmentAlgorithm1H {
 			long time;
 			Arrays.sort(blocks);
 
-			for (int i = 0; i < blocks.length; i++) {
+			for (int i = 0; i <12; i++) {
 				blockParts = blocks[i].split("=");	
 				time = Long.valueOf(blockParts[0].replaceAll("\\s+",""));
 				if (time > timeEpooch) {
 					
 					// se o paciente estiver livre
 					if (blockParts[1].equals("livre")) {
+						
+						if (!timetable.slotTaken(speciality, time)) {
+							return time;
+						}
+					}
+				}
+			}
+			
+			for (int i = 0; i < blocks.length; i++) {
+				blockParts = blocks[i].split("=");	
+				time = Long.valueOf(blockParts[0].replaceAll("\\s+",""));
+				if (time > timeEpooch) {
+					
+					// se o paciente estiver livre
+					if (blockParts[1].equals("livre")||blockParts[1].equals("ocupador")) {
 						
 						if (!timetable.slotTaken(speciality, time)) {
 							return time;
