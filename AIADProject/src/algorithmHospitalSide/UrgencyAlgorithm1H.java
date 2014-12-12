@@ -21,7 +21,38 @@ public class UrgencyAlgorithm1H {
 	private static String speciality;
 	private static long urgentTime;
 	private static int scheduleCount;
+	private static int urgencyWeight=5;
+	private static int patientWeight=2;
+	private static int movedWeight=1;
 	private static boolean startAlgorithm;
+	
+	
+	
+	public static int getUrgencyWeight() {
+		return urgencyWeight;
+	}
+
+	public static void setUrgencyWeight(int urgencyWeight) {
+		UrgencyAlgorithm1H.urgencyWeight = urgencyWeight;
+	}
+
+	public static int getPatientWeight() {
+		return patientWeight;
+	}
+
+	public static void setPatientWeight(int patientWeight) {
+		UrgencyAlgorithm1H.patientWeight = patientWeight;
+	}
+
+	public static int getMovedWeight() {
+		return movedWeight;
+	}
+
+	public static void setMovedWeight(int movedWeight) {
+		UrgencyAlgorithm1H.movedWeight = movedWeight;
+	}
+
+
 
 	public static void startAlgorithm(long urgentTime1, String urgentPatient1,
 			Hospital hospital, String speciality1) {
@@ -165,8 +196,8 @@ public class UrgencyAlgorithm1H {
 	private static int calcFunction(int urgentTimePosted,
 			int numberPatientsMoved, int numberOfBlocksMoved) {
 
-		return urgentTimePosted * 5 + numberPatientsMoved * 2
-				+ numberOfBlocksMoved;
+		return urgentTimePosted * urgencyWeight + numberPatientsMoved * patientWeight
+				+ numberOfBlocksMoved*movedWeight;
 	}
 
 	private static void developBranch(Hospital hospital,

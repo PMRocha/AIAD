@@ -288,10 +288,29 @@ public class HospitalAgent extends Agent {
 		ServiceDescription sd = new ServiceDescription();
 		sd.setName(getName());
 		Object[] args = getArguments();
-		if (args.length == 1) {
-			hospital = new Hospital(0, this, (int) args[0]);
-		} else {
+
+		if (args.length == 0) {
 			hospital = new Hospital(0, this, 1);
+		} else if (args.length == 1) {
+			hospital = new Hospital(0, this, (int) args[0]);
+		} else if (args.length == 2) {
+			hospital = new Hospital(0, this, (int) args[0]);
+			UrgencyAlgorithm1H.setUrgencyWeight((int) args[1]);
+			UrgencyAlgorithm1H.setPatientWeight(0);
+			UrgencyAlgorithm1H.setMovedWeight(0);
+		} else if (args.length == 3) {
+			hospital = new Hospital(0, this, (int) args[0]);
+			UrgencyAlgorithm1H.setUrgencyWeight((int) args[1]);
+			UrgencyAlgorithm1H.setPatientWeight((int) args[2]);
+			UrgencyAlgorithm1H.setMovedWeight(0);
+		} else if (args.length == 4) {
+			hospital = new Hospital(0, this, (int) args[0]);
+			UrgencyAlgorithm1H.setUrgencyWeight((int) args[1]);
+			UrgencyAlgorithm1H.setPatientWeight((int) args[2]);
+			UrgencyAlgorithm1H.setMovedWeight((int) args[3]);
+		} else {
+			System.err.println("Parametros inválidos em hospital");
+			System.exit(1);
 		}
 
 		sd.setType("HospitalAgent");
