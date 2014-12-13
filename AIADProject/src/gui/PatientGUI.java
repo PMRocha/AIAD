@@ -89,7 +89,7 @@ public class PatientGUI extends JFrame implements ActionListener{
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				int result = JOptionPane.showConfirmDialog(new JFrame(), myPanelCancel, 
 						"Please Enter The Current Timestamps", JOptionPane.OK_CANCEL_OPTION);
-				if (result == JOptionPane.OK_OPTION ||currentTimeFieldCancel.getSelectedItem()!=null) {
+				if (result == JOptionPane.OK_OPTION && currentTimeFieldCancel.getSelectedItem()!=null) {
 					if(((long) new Date().parse(currentTimeFieldCancel.getSelectedItem().toString()))/1000<agent.getPatient().getTimeEpooch()){
 						JOptionPane.showMessageDialog(new JPanel(), "Timestamp selected is Invalid (time has passed)");
 					}
@@ -118,7 +118,7 @@ public class PatientGUI extends JFrame implements ActionListener{
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				int result = JOptionPane.showConfirmDialog(new JFrame(), myPanelReschedule, 
 						"Please Enter The New Timestamps", JOptionPane.OK_CANCEL_OPTION);
-				if (result == JOptionPane.OK_OPTION&&(Long)currentTimeFieldReschedule.getSelectedItem()!=null) {
+				if (result == JOptionPane.OK_OPTION && currentTimeFieldReschedule.getSelectedItem()!=null) {
 					if((Long)currentTimeFieldReschedule.getSelectedItem()<agent.getPatient().getTimeEpooch()||(Long)newTimeFieldReschedule.getSelectedItem()<agent.getPatient().getTimeEpooch()){
 						JOptionPane.showMessageDialog(new JPanel(), "Timestamp selected is Invalid (time has passed)");
 					}
