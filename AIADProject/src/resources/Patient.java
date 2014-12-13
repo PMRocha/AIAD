@@ -182,4 +182,8 @@ public class Patient {
 		this.useReserved = useReserved;
 	}
 
+	public long getTimeEpooch() {
+		return timeEpooch;
+	}
+	
 }

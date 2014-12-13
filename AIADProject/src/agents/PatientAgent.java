@@ -1,5 +1,6 @@
 package agents;
 
+import gui.mainWindow;
 import algorithmPatientSide.AppointmentAlgorithm0P;
 import algorithmPatientSide.AppointmentAlgorithm1P;
 import algorithmPatientSide.NotifyAppointmentAlgorithmP;
@@ -20,7 +21,9 @@ public class PatientAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 	private Patient patient;
 	private String name;
-
+	private mainWindow gui;
+	
+	
 	class PatientBehaviour extends SimpleBehaviour {
 
 		private static final long serialVersionUID = 1L;
@@ -199,6 +202,8 @@ public class PatientAgent extends Agent {
 		// cria behaviour
 		PatientBehaviour b = new PatientBehaviour(this);
 		addBehaviour(b);
+		gui = new mainWindow(this);
+		gui.showGui();
 
 	} // fim do metodo setup
 

@@ -4,8 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -285,5 +289,65 @@ public class TimeTable {
 			return 0;
 		}
 		return 0;
+	}
+	
+	public Object[] availableTime(){
+		List<Long> time = new ArrayList<Long>();
+
+		for (Long key : timetable.keySet()) {
+			String content = timetable.get(key);
+
+			if(content.equals("livre"))
+			{
+				time.add(key);
+			}
+		}
+
+		Collections.sort((List<Long>) time);
+
+		return time.toArray();
+	}
+
+	public Object[] consultationTime(){
+		List<Long> time = new ArrayList<Long>();
+
+		for (Long key : timetable.keySet()) {
+			String content = timetable.get(key);
+
+			if(!content.equals("livre")&&!content.equals("ocupado")&&!content.equals("ocupador"))
+			{
+				time.add(key);
+			}
+		}
+
+		Collections.sort(time);
+
+		return time.toArray();
+	}
+
+	public Object[][] getTimetableObject(){
+
+		Object test[][] = new Object[100][2];
+		int i=0;
+		
+		Long[] keys = new Long[100];
+		
+		keys = (Long[])timetable.keySet().toArray(keys);
+		
+		Arrays.sort( keys );
+		
+		for(int j=0;j<100;j++){
+			for(int k=0;k<2;k++){
+				if(i==0){
+					test[j][k] = keys[j];
+					i++;
+				}
+				else{
+					test[j][k] = timetable.get(keys[j]);
+					i=0;
+				}
+			}
+		}
+		return test;
 	}
 }
