@@ -1,6 +1,6 @@
 package agents;
 
-import gui.mainWindow;
+import gui.PatientGUI;
 import algorithmPatientSide.AppointmentAlgorithm0P;
 import algorithmPatientSide.AppointmentAlgorithm1P;
 import algorithmPatientSide.NotifyAppointmentAlgorithmP;
@@ -21,9 +21,9 @@ public class PatientAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 	private Patient patient;
 	private String name;
-	private mainWindow gui;
-	
-	
+	private PatientGUI gui;
+
+
 	class PatientBehaviour extends SimpleBehaviour {
 
 		private static final long serialVersionUID = 1L;
@@ -39,81 +39,82 @@ public class PatientAgent extends Agent {
 			ACLMessage reply = msg.createReply();
 			String content = msg.getContent();
 
-				if (content.equals("Aberto para servico")) {
-					patient.runTime();
+			if (content.equals("Aberto para servico")) {
+				patient.runTime();
+			}
+
+			else {
+				String[] parts = content.split("-");
+
+				switch (parts[0]) {
+				case "Remarcacao": {
+					System.out.println(getLocalName() + ": recebi "
+							+ msg.getContent());
+					reply = AppointmentAlgorithm0P.reappointment(Long
+							.valueOf(parts[1]).longValue(), msg, reply,
+							patient);
+					System.out.println(name + ":enviei->"
+							+ reply.getContent());
+					if (!reply.equals(null))
+						send(reply);
+					break;
+				}
+				case "Aproximacao": {
+					System.out.println(name + ":recebi->Confirmacao:"
+							+ parts[1] + "," + parts[2]);
+					reply = NotifyAppointmentAlgorithmP.doNotification(
+							reply, patient, parts[2]);
+					System.out.println(name + ":mandei->"
+							+ reply.getContent());
+					send(reply);
+					break;
+				}
+				case "Marcado": {
+					System.out.println(name + ":recebi->consulta marcada:"
+							+ parts[1]);
+					patient.setAppointment(Long.valueOf(parts[1])
+							.longValue());
+					gui.refresh(parts[0],Long.valueOf(parts[1]).longValue());
+					break;
+				}
+				case "MarcadoUrgencia": {
+					System.out.println(name + ":recebi->urgencia marcada:"
+							+ parts[1]);
+					patient.setUrgentAppointment(Long.valueOf(parts[1]).longValue());
+					gui.refresh(parts[0],Long.valueOf(parts[1]).longValue());
+					break;
+				}
+				case "DesmarcadaPorUrgencia": {
+					System.out.println(name
+							+ ":recebi->consulta desmarcada " + parts[1]);
+					reply=UrgencyAlgorithm0P.createReapointmentUrgenceMessage(reply,Long.valueOf(parts[2]).longValue(),parts[1], patient);
+					send(reply);
+					break;
+				}
+				case "RemarcadaConsulta": {
+					System.out.println(name
+							+ ":recebi->consulta adiantada marcada:"
+							+ parts[1]);
+					reply = ReappointmentAlgorithmP.reappointment(reply,
+							parts, patient);
+					send(reply);
+				}
+				break;
+				case "Horario": {
+					System.out.println(name
+							+ ":recebi->Horário:"
+							+ parts[1]);
+					reply = UrgencyAlgorithm1P.schedule(reply,
+							Long.valueOf(parts[1]).longValue(), patient);
+					send(reply);
+				}
+				break;
+				default: {
+					System.out.println(name
+							+ ":recebi->Mensagem não reconhecida:"
+							+ msg.getContent());
 				}
 
-				else {
-					String[] parts = content.split("-");
-
-					switch (parts[0]) {
-					case "Remarcacao": {
-						System.out.println(getLocalName() + ": recebi "
-								+ msg.getContent());
-						reply = AppointmentAlgorithm0P.reappointment(Long
-								.valueOf(parts[1]).longValue(), msg, reply,
-								patient);
-						System.out.println(name + ":enviei->"
-								+ reply.getContent());
-						if (!reply.equals(null))
-							send(reply);
-						break;
-					}
-					case "Aproximacao": {
-						System.out.println(name + ":recebi->Confirmacao:"
-								+ parts[1] + "," + parts[2]);
-						reply = NotifyAppointmentAlgorithmP.doNotification(
-								reply, patient, parts[2]);
-						System.out.println(name + ":mandei->"
-								+ reply.getContent());
-						send(reply);
-						break;
-					}
-					case "Marcado": {
-						System.out.println(name + ":recebi->consulta marcada:"
-								+ parts[1]);
-						patient.setAppointment(Long.valueOf(parts[1])
-								.longValue());
-						break;
-					}
-					case "MarcadoUrgencia": {
-						System.out.println(name + ":recebi->urgencia marcada:"
-								+ parts[1]);
-						patient.setUrgentAppointment(Long.valueOf(parts[1])
-								.longValue());
-						break;
-					}
-					case "DesmarcadaPorUrgencia": {
-						System.out.println(name
-								+ ":recebi->consulta desmarcada " + parts[1]);
-						reply=UrgencyAlgorithm0P.createReapointmentUrgenceMessage(reply,Long.valueOf(parts[2]).longValue(),parts[1], patient);
-						send(reply);
-						break;
-					}
-					case "RemarcadaConsulta": {
-						System.out.println(name
-								+ ":recebi->consulta adiantada marcada:"
-								+ parts[1]);
-						reply = ReappointmentAlgorithmP.reappointment(reply,
-								parts, patient);
-						send(reply);
-					}
-						break;
-					case "Horario": {
-						System.out.println(name
-								+ ":recebi->Horário:"
-								+ parts[1]);
-						reply = UrgencyAlgorithm1P.schedule(reply,
-								Long.valueOf(parts[1]).longValue(), patient);
-						send(reply);
-					}
-						break;
-					default: {
-						System.out.println(name
-								+ ":recebi->Mensagem não reconhecida:"
-								+ msg.getContent());
-					}
-					
 				}
 			}
 		}
@@ -153,6 +154,32 @@ public class PatientAgent extends Agent {
 				+ patient.getTimetable().firstAvailable(nextHour));
 		msg = setReceiverHospital(msg);
 		send(msg);
+	}
+
+	public void cancelAppointment(long appTime) {
+
+		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+		gui.removeTime(appTime);
+		patient.getTimetable().timetable.put(appTime,"livre");
+		System.out.println(appTime);
+		msg.setContent("Desmarcar-"+patient.getSpeciality()+"-"+appTime);
+		if (!msg.equals(null)) {
+			msg = setReceiverHospital(msg);
+			send(msg);
+		}
+	}
+
+	public void Reappointment(long timeAppointment,long newTimeAppointment) {
+		patient.getTimetable().timetable.put(timeAppointment, "livre");
+		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+		msg.setContent("RemarcacaoAproximacao-"
+				+ patient.getSpeciality() + "-" + timeAppointment + "-"
+				+ patient.getTimetable().firstAvailable(newTimeAppointment));
+		gui.removeTime(timeAppointment);
+		if (!msg.equals(null)) {
+			msg = setReceiverHospital(msg);
+			send(msg);
+		}
 	}
 
 	public ACLMessage setReceiverHospital(ACLMessage msg) {
@@ -202,7 +229,7 @@ public class PatientAgent extends Agent {
 		// cria behaviour
 		PatientBehaviour b = new PatientBehaviour(this);
 		addBehaviour(b);
-		gui = new mainWindow(this);
+		gui = new PatientGUI(this);
 		gui.showGui();
 
 	} // fim do metodo setup

@@ -1,5 +1,7 @@
 package agents;
 
+import gui.HospGUI;
+import gui.PatientGUI;
 import algorithmHospitalSide.AppointmentAlgorithm0H;
 import algorithmHospitalSide.AppointmentAlgorithm1H;
 import algorithmHospitalSide.ReappointmentAlgorithmH;
@@ -18,6 +20,12 @@ public class HospitalAgent extends Agent {
 
 	private static final long serialVersionUID = 1L;
 	private Hospital hospital;
+
+	private HospGUI gui;
+	
+	public Hospital getHospital() {
+		return hospital;
+	}
 
 	// classe do behaviour
 	class HospitalPlannerBehaviour extends SimpleBehaviour {
@@ -55,6 +63,10 @@ public class HospitalAgent extends Agent {
 					urgencyAction1(reply, parts);
 				break;
 			}
+			case "Desmarcar": {
+				hospital.getTimetable().cancelConsultation(Long.valueOf(parts[2]).longValue(), parts[1]);
+				break;
+			}
 			case "RemarcadoPorUrgencia": {
 				urgencyReappointmentAction(reply, parts);
 				break;
@@ -90,6 +102,7 @@ public class HospitalAgent extends Agent {
 
 			}
 			}
+			gui.refresh();
 
 		}
 
@@ -182,7 +195,7 @@ public class HospitalAgent extends Agent {
 				send(forwardMessage);
 			} else {
 				System.out
-						.println("No more parients in the twelve hours diference");
+				.println("No more parients in the twelve hours diference");
 			}
 		}
 
@@ -248,7 +261,7 @@ public class HospitalAgent extends Agent {
 				send(reply);
 			else
 				System.out
-						.println("Impossivel marcar urgencia(sai do limite do horário)");
+				.println("Impossivel marcar urgencia(sai do limite do horário)");
 		}
 
 		private void urgencyAction1(ACLMessage reply, String[] parts) {
@@ -330,6 +343,8 @@ public class HospitalAgent extends Agent {
 
 		sd1.setType("PatientAgent");
 		template.addServices(sd1);
+		gui = new HospGUI(this);
+		gui.showGui();
 		try {
 			DFAgentDescription[] result = DFService.search(this, template);
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);

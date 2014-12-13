@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -292,31 +293,31 @@ public class TimeTable {
 	}
 	
 	public Object[] availableTime(){
-		List<Long> time = new ArrayList<Long>();
+		List<Date> time = new ArrayList<Date>();
 
 		for (Long key : timetable.keySet()) {
 			String content = timetable.get(key);
 
 			if(content.equals("livre"))
 			{
-				time.add(key);
+				time.add(new Date(key*1000));
 			}
 		}
 
-		Collections.sort((List<Long>) time);
+		Collections.sort(time);
 
 		return time.toArray();
 	}
 
 	public Object[] consultationTime(){
-		List<Long> time = new ArrayList<Long>();
+		List<Date> time = new ArrayList<Date>();
 
 		for (Long key : timetable.keySet()) {
 			String content = timetable.get(key);
 
 			if(!content.equals("livre")&&!content.equals("ocupado")&&!content.equals("ocupador"))
 			{
-				time.add(key);
+				time.add(new Date(key*1000));
 			}
 		}
 
@@ -339,7 +340,7 @@ public class TimeTable {
 		for(int j=0;j<100;j++){
 			for(int k=0;k<2;k++){
 				if(i==0){
-					test[j][k] = keys[j];
+					test[j][k] = new Date(keys[j]*1000);
 					i++;
 				}
 				else{
