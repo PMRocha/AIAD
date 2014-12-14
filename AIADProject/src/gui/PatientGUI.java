@@ -21,6 +21,7 @@ import javax.swing.JTable;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 import javax.swing.JSeparator;
+import javax.swing.Timer;
 
 public class PatientGUI extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
@@ -30,9 +31,10 @@ public class PatientGUI extends JFrame implements ActionListener{
 	private Object columnNames[] = { "TimeStamp", "Ocupation"};
 	JComboBox<String> currentTimeFieldCancel;
 	JComboBox<String> currentTimeFieldReschedule;
+	private JLabel HourLabel;
 
 	public PatientGUI(PatientAgent agent) {
-
+		
 		super(agent.getLocalName());
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -40,12 +42,16 @@ public class PatientGUI extends JFrame implements ActionListener{
 
 		JComboBox<Long> currentTimeFieldAddConsultation = new JComboBox(agent.getPatient().getTimetable().availableTime());
 
+		this.agent = agent;
+		
 		JPanel myPanelAddConsultation = new JPanel();
 		myPanelAddConsultation.add(new JLabel("Current Time:"));
 		myPanelAddConsultation.add(currentTimeFieldAddConsultation);
 
 		JLabel lblNewLabel = new JLabel(agent.getLocalName());
 		getContentPane().add(lblNewLabel, BorderLayout.NORTH);
+		
+		HourLabel = new JLabel(new Date(agent.getPatient().getTimeEpooch()*1000).toString());
 
 		JToolBar toolBar = new JToolBar();
 		toolBar.setOrientation(SwingConstants.VERTICAL);
@@ -69,6 +75,29 @@ public class PatientGUI extends JFrame implements ActionListener{
 			}	
 		});
 
+		ActionListener taskPerformer = new ActionListener() {
+			@Override
+
+            public void actionPerformed(ActionEvent evt) {
+				HourLabel.setText(new Date(agent.getPatient().getTimeEpooch()*1000).toString());
+				Object[][] temp = agent.getPatient().getTimetable().getTimetableObject();
+				for(int i=0;i<100;i++){
+					for(int j=0;j<2;j++){
+						table.setValueAt(temp[i][j], i, j);
+					}
+				}
+				currentTimeFieldCancel.removeAllItems();
+				currentTimeFieldReschedule.removeAllItems();
+				currentTimeFieldCancel = new JComboBox(agent.getPatient().getTimetable().consultationTime());
+				currentTimeFieldReschedule = new JComboBox(agent.getPatient().getTimetable().consultationTime());
+            }
+        };
+
+        Timer t = new Timer(250, taskPerformer);
+        t.start();
+        
+		toolBar.add(HourLabel);
+		
 		JSeparator separator_3 = new JSeparator();
 		toolBar.add(separator_3);
 		toolBar.add(addConsultationButton);

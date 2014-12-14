@@ -162,10 +162,10 @@ public class TimeTable {
 		}
 	}
 
-	 public String CheckConsultationsNow(long timeEpoch, String Especialidade){
-		  return interpretConsultations(timetable.get(timeEpoch)).get(Especialidade);
-		 }
-	 
+	public String CheckConsultationsNow(long timeEpoch, String Especialidade){
+		return interpretConsultations(timetable.get(timeEpoch)).get(Especialidade);
+	}
+
 	// returns timestamp of the first free time since the time given (0 if none)
 	public long firstAvailable(long timeEpooch) {
 
@@ -248,12 +248,14 @@ public class TimeTable {
 			for (String key : temp.keySet()) {
 				if (!key.equals(speciality)) {
 					if (newContent.length() > 1) {
-						newContent += ";" + key + "-" + timetable.get(key);
+						newContent += ";" + key + "-" + temp.get(key);
 					} else {
-						newContent += key + "-" + timetable.get(key);
+						newContent += key + "-" + temp.get(key);
 					}
 				}
+
 			}
+
 			timetable.put(timeEpooch, newContent);
 		}
 	}
@@ -291,7 +293,7 @@ public class TimeTable {
 		}
 		return 0;
 	}
-	
+
 	public Object[] availableTime(){
 		List<Date> time = new ArrayList<Date>();
 
@@ -330,13 +332,13 @@ public class TimeTable {
 
 		Object test[][] = new Object[100][2];
 		int i=0;
-		
+
 		Long[] keys = new Long[100];
-		
+
 		keys = (Long[])timetable.keySet().toArray(keys);
-		
+
 		Arrays.sort( keys );
-		
+
 		for(int j=0;j<100;j++){
 			for(int k=0;k<2;k++){
 				if(i==0){

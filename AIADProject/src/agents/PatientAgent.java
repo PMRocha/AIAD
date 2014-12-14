@@ -74,14 +74,14 @@ public class PatientAgent extends Agent {
 							+ parts[1]);
 					patient.setAppointment(Long.valueOf(parts[1])
 							.longValue());
-					gui.refresh(parts[0],Long.valueOf(parts[1]).longValue());
+					//gui.refresh(parts[0],Long.valueOf(parts[1]).longValue());
 					break;
 				}
 				case "MarcadoUrgencia": {
 					System.out.println(name + ":recebi->urgencia marcada:"
 							+ parts[1]);
 					patient.setUrgentAppointment(Long.valueOf(parts[1]).longValue());
-					gui.refresh(parts[0],Long.valueOf(parts[1]).longValue());
+					//gui.refresh(parts[0],Long.valueOf(parts[1]).longValue());
 					break;
 				}
 				case "DesmarcadaPorUrgencia": {
