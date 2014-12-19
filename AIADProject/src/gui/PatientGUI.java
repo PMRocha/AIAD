@@ -34,7 +34,7 @@ public class PatientGUI extends JFrame implements ActionListener{
 	private JLabel HourLabel;
 
 	public PatientGUI(PatientAgent agent) {
-		
+
 		super(agent.getLocalName());
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -43,14 +43,14 @@ public class PatientGUI extends JFrame implements ActionListener{
 		JComboBox<Long> currentTimeFieldAddConsultation = new JComboBox(agent.getPatient().getTimetable().availableTime());
 
 		this.agent = agent;
-		
+
 		JPanel myPanelAddConsultation = new JPanel();
 		myPanelAddConsultation.add(new JLabel("Current Time:"));
 		myPanelAddConsultation.add(currentTimeFieldAddConsultation);
 
 		JLabel lblNewLabel = new JLabel(agent.getLocalName());
 		getContentPane().add(lblNewLabel, BorderLayout.NORTH);
-		
+
 		HourLabel = new JLabel(new Date(agent.getPatient().getTimeEpooch()*1000).toString());
 
 		JToolBar toolBar = new JToolBar();
@@ -78,7 +78,7 @@ public class PatientGUI extends JFrame implements ActionListener{
 		ActionListener taskPerformer = new ActionListener() {
 			@Override
 
-            public void actionPerformed(ActionEvent evt) {
+			public void actionPerformed(ActionEvent evt) {
 				HourLabel.setText(new Date(agent.getPatient().getTimeEpooch()*1000).toString());
 				Object[][] temp = agent.getPatient().getTimetable().getTimetableObject();
 				for(int i=0;i<100;i++){
@@ -88,16 +88,19 @@ public class PatientGUI extends JFrame implements ActionListener{
 				}
 				currentTimeFieldCancel.removeAllItems();
 				currentTimeFieldReschedule.removeAllItems();
-				currentTimeFieldCancel = new JComboBox(agent.getPatient().getTimetable().consultationTime());
-				currentTimeFieldReschedule = new JComboBox(agent.getPatient().getTimetable().consultationTime());
-            }
-        };
+				Object[] temp1 = agent.getPatient().getTimetable().consultationTime();
+				for(int j=0; j<temp1.length;j++){
+					currentTimeFieldCancel.addItem(temp1[0].toString());
+					currentTimeFieldReschedule.addItem(temp1[0].toString());
+				}
+			}
+		};
 
-        Timer t = new Timer(250, taskPerformer);
-        t.start();
-        
+		Timer t = new Timer(250, taskPerformer);
+		t.start();
+
 		toolBar.add(HourLabel);
-		
+
 		JSeparator separator_3 = new JSeparator();
 		toolBar.add(separator_3);
 		toolBar.add(addConsultationButton);
@@ -207,7 +210,7 @@ public class PatientGUI extends JFrame implements ActionListener{
 		currentTimeFieldCancel.addItem(new Date(time*1000).toString());
 		currentTimeFieldReschedule.addItem(new Date(time*1000).toString());
 	}
-	
+
 	public void removeTime(long time){
 		table.setValueAt("livre", (int) ((time-1420070400)/3600), 1);
 		currentTimeFieldCancel.removeItem(new Date(time*1000).toString());
